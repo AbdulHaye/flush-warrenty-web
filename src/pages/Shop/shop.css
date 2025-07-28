@@ -1,0 +1,266 @@
+.prominent-card {
+  width: 350px!important;
+}
+
+.shop-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 0;
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.shop-title {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 44px;
+  margin-bottom: 15px;
+  color: black;
+}
+
+.shop-subtitle {
+  font-size: 26px;
+  line-height: 39px;
+  color: black;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px 48px;
+  padding: 0 32px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.product-card {
+  position: relative;
+  padding: 24px;
+  background-color: #f7fbff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d1d5db;
+  width: 300px;
+  margin: 0 auto;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.product-card:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.popular-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #059669;
+  color: white;
+  padding: 4px 12px;
+  border-top-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-image {
+  width: 48px;
+  height: 48px;
+}
+
+.price-info {
+  text-align: right;
+}
+
+.price-label {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.price-value {
+  font-size: 30px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.price-duration {
+  font-size: 12px;
+  color: #4b5563;
+  margin-top: 4px;
+}
+
+.price-select {
+  font-size: 12px;
+  color: #374151;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-top: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.price-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.card-title {
+  color: #2563eb;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  line-height: 40px !important;
+  margin-bottom: 8px !important;
+}
+
+.card-description {
+  color: #1f2937;
+  font-size: 14px !important;
+  margin-bottom: 4px !important;
+}
+
+.card-note {
+  color: #6b7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.card-section {
+  border-top: 1px solid #d1d5db;
+  padding: 12px 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.section-arrow {
+  transition: transform 0.3s;
+}
+
+.section-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  margin-top: 8px;
+}
+
+.content-list {
+  margin-top: 8px;
+  padding-left: 16px;
+}
+
+.content-item {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.content-paragraph {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.card-actions {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.select-button {
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+  padding: 8px 24px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.select-button:hover {
+  background-color: #1d4ed8;
+}
+
+.proceed-button {
+  background-color: #059669;
+  color: white;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.proceed-button:hover {
+  background-color: #047857;
+}
+
+.delete-icon {
+  color: #6b7280;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+}
+
+.price-duration-container {
+  position: relative;
+}
+
+.price-duration {
+  margin: 0;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.price-duration:hover {
+  border-color: #ddd;
+  background-color: #f5f5f5;
+}
+
+.price-select {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Add these if not already in your CSS */

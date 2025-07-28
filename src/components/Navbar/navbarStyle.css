@@ -1,0 +1,323 @@
+/* Base styles */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
+
+.navbar-header {
+  width: 100% !important;
+  padding-left: 20% !important;
+  background-color: #a7edff !important;
+  padding: 1rem 0 !important;
+  border-radius: 0.25rem !important;
+  position: relative;
+}
+
+.navbar-container {
+  max-width: 90% !important; /* Use percentage for flexibility */
+  margin: 0 auto !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0 1rem !important;
+}
+
+.logo-container {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.logo-img {
+  width: 6rem !important; /* Use rem for scalability */
+  height: auto !important;
+}
+
+/* Mobile contact info (centered below 1250px) */
+.mobile-contact-info {
+  display: flex;
+  justify-content: end; /* Positions phone on left, My Account on right */
+  width: 40%; /* Adjusted to fit nicely within the container */
+  align-items: center;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.mobile-phone-number,
+.mobile-account-link {
+  color: #3a7bd5;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  font-family: "Roboto", sans-serif;
+  font-size: clamp(10px, 2.5vw, 0.875rem); /* Use rem */
+  font-weight: 400;
+}
+
+.mobile-phone-number {
+  cursor: pointer;
+}
+
+/* Desktop navigation (shown above 1250px) */
+.desktop-nav {
+  display: none !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+}
+
+.nav-links-container {
+  background-color: white !important;
+  border-radius: 9999px !important;
+  padding: 0 1.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  display: flex !important;
+  gap: 1rem !important;
+  align-items: center !important;
+  justify-content: center !important; /* Center the links horizontally */
+  width: 70% !important;
+  min-height: 3rem !important; /* Use rem for height */
+  margin: 0 auto !important; /* Center the container itself */
+  padding-left: 0 !important; /* Remove left padding to center content */
+}
+
+.main-nav {
+  display: flex !important;
+  gap: 2rem !important; /* Reduced gap for better fit */
+  color: #4b5563 !important;
+  font-weight: 600 !important;
+  justify-content: center !important; /* Ensure links are centered within main-nav */
+}
+
+.nav-link {
+  color: #4b5563 !important;
+  padding: 0.8125rem 0 !important;
+  text-decoration: none !important;
+  font-family: "Alegreya Sans", "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 1rem !important; /* Use rem for font size */
+  font-weight: 530 !important;
+}
+
+.nav-link.active {
+  color: #4b5563 !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+  font-size: 1rem !important;
+  font-weight: 530 !important;
+}
+
+.scroll-link {
+  background: none !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  font-weight: inherit !important;
+  padding: 0.8125rem 0 !important;
+  cursor: pointer !important;
+}
+
+.desktop-contact-info {
+  display: flex !important;
+  gap: 2rem !important; /* Adjusted gap */
+  align-items: center !important;
+}
+
+.iconofphonenumberandaccount {
+  color: #3a7bd5 !important;
+}
+
+.phone-number {
+  color: #3a7bd5 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  font-family: "Roboto", sans-serif !important;
+  font-size: 0.875rem !important; /* Use rem */
+  font-weight: 400 !important;
+}
+
+.account-link {
+  color: #3a7bd5 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  text-decoration: none !important;
+  font-family: "Roboto", sans-serif !important;
+  font-size: 0.875rem !important; /* Use rem */
+  font-weight: 400 !important;
+}
+
+/* Mobile menu button */
+.mobile-menu-button {
+  display: block !important;
+}
+
+.menu-toggle {
+  color: #1f2937 !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+}
+
+/* Mobile navigation dropdown */
+.mobile-nav {
+  display: block !important;
+  background-color: white !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  padding: 1rem !important;
+}
+
+.mobile-nav-links {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  color: #1f2937 !important;
+}
+
+.mobile-nav-link {
+  color: #1f2937 !important;
+  text-decoration: none !important;
+  padding: 0.5rem 0 !important;
+  text-align: left !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1731px) {
+  .navbar-container {
+    max-width: 85% !important; /* Adjust for smaller screens */
+  }
+
+  .nav-links-container {
+    width: 65% !important;
+  }
+
+  .main-nav {
+    gap: 1.5rem !important;
+  }
+
+  .mobile-contact-info {
+    width: 45%; /* Adjust width for smaller screens */
+  }
+}
+
+@media (max-width: 1485px) {
+  .navbar-container {
+    max-width: 80% !important;
+  }
+
+  .mobile-contact-info {
+    gap: 1rem !important;
+  }
+
+  .nav-links-container {
+    width: 60% !important;
+  }
+
+  .main-nav {
+    gap: 1.2rem !important;
+  }
+
+  .phone-number {
+    font-size: 0.75rem !important;
+  }
+
+  .account-link {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 1385px) {
+  .navbar-container {
+    max-width: 75% !important;
+  }
+
+  .logo-img {
+    width: 5rem !important;
+  }
+
+  .mobile-contact-info {
+    gap: 0.75rem !important;
+  }
+
+  .nav-links-container {
+    width: 55% !important;
+  }
+
+  .main-nav {
+    gap: 1rem !important;
+  }
+
+  .nav-link, .nav-link.active {
+    font-size: 0.875rem !important;
+  }
+}
+
+@media (max-width: 1249px) {
+  .mobile-contact-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    width: 40% !important;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1250px) {
+  .desktop-nav {
+    display: flex !important;
+    flex: 1 !important;
+    justify-content: center !important; /* Center the entire desktop-nav */
+    margin: 0 auto !important;
+  }
+
+  .mobile-contact-info {
+    display: none !important;
+  }
+
+  .mobile-menu-button {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-contact-info {
+    width: 50% !important;
+    margin-right: auto !important;
+  }
+
+  .logo-img {
+    width: clamp(3rem, 5vw, 4rem) !important;
+  }
+
+  .nav-links-container {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-contact-info {
+    width: 70% !important;
+    margin-right: 0.125rem !important;
+  }
+
+  .logo-img {
+    width: clamp(3.375rem, 4vw, 4rem) !important;
+  }
+}
+
+/* Animation for mobile menu */
+.mobile-nav {
+  animation: fadeIn 0.3s ease-out !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}

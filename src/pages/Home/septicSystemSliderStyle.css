@@ -1,0 +1,130 @@
+/* Base styles */
+.septic-slider-container {
+  background-color: #F4FDFF;
+  padding: 2.4rem 0.8rem;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.septic-slider-title {
+  font-family: "IBM Plex Serif", Sans-serif;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 48px;
+  color: #0B1A5F;
+  margin-bottom: 0.4rem;
+}
+
+.underline-container {
+  margin-top: 1.6rem;
+}
+
+.underline-image {
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.septic-slider-description {
+  text-align: center;
+  font-family: "Roboto", Sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #7A7A7A;
+  margin-top: 0.4rem;
+}
+
+/* Carousel styles */
+.carousel-wrapper {
+  overflow: hidden;
+  margin-top: 1.6rem;
+  width: 100%;
+}
+
+.carousel {
+  display: flex;
+  gap: 0.8rem;
+  width: max-content;
+  animation: slide 20s linear infinite; /* Longer duration for smoothness */
+}
+
+.carousel-item {
+  min-width: 240px;
+  min-height: 200px;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin: 0.8rem 0.4rem;
+  flex-shrink: 0; /* Prevent items from shrinking */
+}
+
+.item-name {
+  font-family: "IBM Plex Serif", Sans-serif;
+  font-weight: 500;
+  color: #212529;
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+  margin-top: 16px;
+}
+
+.item-price {
+  color: #3A7BD5;
+  font-family: "Alegreya Sans", Sans-serif;
+  font-size: 1.76rem;
+}
+
+/* Animation */
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* Move by half the total width due to duplicated items */
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .septic-slider-title {
+    font-size: 0.96rem;
+  }
+  .carousel-item {
+    min-width: 200px;
+    padding: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .septic-slider-container {
+    padding: 1.6rem 0.8rem;
+  }
+  .septic-slider-title {
+    font-size: 0.88rem;
+  }
+  .carousel-item {
+    min-width: 160px;
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .septic-slider-title {
+    font-size: 0.92rem;
+  }
+  .septic-slider-description {
+    font-size: 0.7rem;
+  }
+  .carousel-item {
+    min-width: 144px;
+    padding: 1rem;
+    margin: 0.6rem 0.2rem;
+  }
+  .item-name {
+    font-size: 0.8rem;
+  }
+  .item-price {
+    font-size: 0.7rem;
+  }
+}

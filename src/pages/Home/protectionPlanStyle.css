@@ -1,0 +1,163 @@
+.protection-plan-container {
+  background-color: #f4fdff;
+  padding: 3.2rem 0.8rem;
+}
+
+.protection-plan-title {
+  width: 50%;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #0b1a5f;
+  font-family: "IBM Plex Serif", sans-serif;
+  text-align: center;
+  margin-bottom: 1.44rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1;
+}
+
+.underline-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.4rem;
+}
+
+.underline-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+.protection-plan-container1 {
+  background-color: #f4fdff;
+  padding: 3.2rem 0.8rem;
+  margin-top: 16px;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.6rem;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.protection-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #f8fafc;
+  padding: 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 1.2rem;
+  box-shadow: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.protection-card:hover {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-color: #e5e7eb;
+}
+
+.card-icon {
+  width: 4.4rem !important;
+  height: 4.4rem !important;
+  margin-bottom: 0.8rem;
+  object-fit: contain;
+}
+
+.card-title {
+  font-size: 2rem !important;
+  font-weight: 650;
+  margin-top: 0.08rem;
+}
+
+.card-description {
+  color: #212529;
+  text-align: left;
+  margin-top: 0.44rem;
+  font-size: 1.04rem !important;
+  line-height: 1.5;
+  width: 80%;
+}
+
+@media (min-width: 1450px) {
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 650;
+    margin-top: 0.08rem;
+  }
+  
+  .card-description {
+    color: #212529;
+    text-align: left;
+    margin-top: 0.44rem;
+    font-size: 0.304rem;
+    line-height: 1.5;
+    width: 80%;
+  }
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .protection-plan-container {
+    padding: 3.2rem 4rem;
+  }
+
+  .cards-container {
+    flex-direction: row;
+  }
+
+  .protection-card {
+    flex: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .protection-plan-container {
+    padding: 3.2rem 5.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .protection-plan-title {
+    width: 90%;
+    font-size: 1.6rem;
+  }
+
+  .protection-card {
+    align-items: center;
+    text-align: center;
+  }
+
+  .card-description {
+    text-align: center;
+  }
+}
+
+/* Additional media query for very large screens */
+@media (min-width: 1440px) {
+  .protection-plan-container {
+    padding: 4rem 8rem;
+  }
+
+  .protection-plan-title {
+    font-size: 2.8rem;
+  }
+
+  .card-icon {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .card-description {
+    font-size: 0.88rem;
+  }
+}

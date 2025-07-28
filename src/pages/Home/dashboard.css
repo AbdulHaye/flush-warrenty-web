@@ -1,0 +1,114 @@
+/* Button Styles */
+.btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* PDF Viewer Styles */
+.pdf-preview-container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+
+/* Updated Styles for Logout Button */
+.dashboard-logout-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px 16px;
+  background-color: #2563eb; /* Match primary button color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.dashboard-title {
+  text-align: center;
+  font-size: 4rem; /* Slightly smaller for better balance */
+  font-weight: 800;
+  color: #1a202c; /* Dark color for contrast */
+  background: linear-gradient(to right, #2563eb, #60a5fa); /* Gradient matching blue theme */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 2.5rem;
+  position: relative;
+  letter-spacing: 1px;
+}
+
+/* Underline effect for the title */
+.dashboard-title::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(to right, #2563eb, #60a5fa);
+  border-radius: 2px;
+}
+.dashboard-logout-btn:hover {
+  background-color: #1d4ed8; /* Match primary button hover */
+}
+
+
+@media (max-width: 640px) {
+  .dashboard-title {
+    font-size: 2.5rem; /* Smaller font for mobile */
+    margin-bottom: 1.5rem;
+  }
+
+  .dashboard-title::after {
+    width: 80px;
+    height: 3px;
+  }
+
+  .dashboard-logout-btn {
+    font-size: 0.875rem;
+    padding: 6px 12px;
+    top: -50px; /* Adjust position to avoid overlap */
+    right: 0;
+  }
+}
+
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .dashboard-title {
+    font-size: 3.5rem;
+  }
+
+  .dashboard-logout-btn {
+    top: -60px; /* Adjust for tablet */
+  }
+}
