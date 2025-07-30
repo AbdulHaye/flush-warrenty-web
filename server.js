@@ -5,8 +5,14 @@ const config = require("./config/config");
 const app = express();
 
 // Middleware
-app.use(express.json());
 app.use(cors());
+app.use(
+  express.json({
+    verify: (req, res, buf, encoding) => {
+      req.rawBody = buf.toString();
+    },
+  })
+);
 
 // Routes
 const customValuesRoutes = require("./routes/customValuesRoutes");

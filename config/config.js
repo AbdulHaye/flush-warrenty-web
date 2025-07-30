@@ -7,6 +7,7 @@ module.exports = {
   ghlApiVersion: "2021-07-28",
   nmiApiUrl: process.env.NMI_API_URL,
   customValueId: "ZKXV4IYMT4uPQkQ0GV3G",
-  redirectUri:
-    "https://webhook.site/ec94c8d3-0d37-4c5f-9587-ce56db72d44c/oauth/callback",
+  redirectUri: "https://webhook.site/ec94c8d3-0d37-4c5f-9587-ce56db72d44c/oauth/callback",
+  nmiSigningKey: process.env.NMI_SIGNING_KEY,
+  ghlWebhookUrl: process.env.GHL_WEBHOOK_URL,
 };
