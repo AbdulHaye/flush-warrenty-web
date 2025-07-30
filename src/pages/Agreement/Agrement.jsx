@@ -442,7 +442,12 @@ function Agreement() {
     try {
       await uploadFiles();
       navigate("/payment-method", {
-        state: { selectedPlans, totalPayment, contactData: editableFields },
+        state: {
+          selectedPlans,
+          totalPayment,
+          contactData: editableFields,
+          contactId: id,
+        },
       });
     } catch (error) {
       alert(`Failed to upload files: ${error.message}`);

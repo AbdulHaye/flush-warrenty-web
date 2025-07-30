@@ -10,7 +10,8 @@ import "../../components/Loader/loader.css"; // Import your loader CSS
 function PaymentMethod() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { selectedPlans, totalPayment, contactData } = location.state || {};
+  const { selectedPlans, totalPayment, contactData, contactId } =
+    location.state || {};
 
   const [paymentMethod, setPaymentMethod] = useState("creditCard");
   const [cardDetails, setCardDetails] = useState({
@@ -35,7 +36,7 @@ function PaymentMethod() {
   const CORS_PROXY = import.meta.env.VITE_CORS_PROXY;
 
   useEffect(() => {
-    if (!selectedPlans || !contactData) {
+    if (!selectedPlans || !contactData || !contactId) {
       navigate("/");
     }
 
@@ -45,7 +46,7 @@ function PaymentMethod() {
 
     // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
-  }, [selectedPlans, contactData, navigate]);
+  }, [selectedPlans, contactData, contactId, navigate]);
 
   const handleCardChange = (e) => {
     const { name, value } = e.target;
@@ -193,7 +194,11 @@ function PaymentMethod() {
 
         const response = await axios.post(
           `${import.meta.env.VITE_SERVER_BASE_URL}/api/nmi-subscription`,
-          { params: params.toString() },
+          {
+            params: params.toString(),
+            contactId: contactId,
+            contactData: contactData,
+          },
           { headers: { "Content-Type": "application/json" } }
         );
 
