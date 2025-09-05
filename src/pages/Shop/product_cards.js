@@ -280,7 +280,7 @@ const productCards = [
             "Repair or replacement of cracked, broken, or collapsed sewer pipes.",
             "Relining of damaged sewer pipes.",
             "Repair or replacement of pipe joints and fittings.",
-            "Ejector Pump Coverage",
+            // "Ejector Pump Coverage",
             "Transferability: Coverage can be transferred to the next homeowner."
           ],
         },
