@@ -17,6 +17,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 const SignatureComponent = ({ onSave }) => {
     const signaturePadRef = useRef(null);
 
+
+    
     const handleClear = () => {
         signaturePadRef.current.clear();
     };
