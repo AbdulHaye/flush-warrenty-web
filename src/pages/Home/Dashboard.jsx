@@ -19,7 +19,11 @@ function Dashboard() {
   const contactId = localStorage.getItem("contactId");
   const [minLoading, setMinLoading] = useState(true);
   const navigate = useNavigate(); // Initialize useNavigate
+  
 
+
+  
+  
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("contactId"); // Clear contactId from localStorage
