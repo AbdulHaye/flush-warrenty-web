@@ -85,7 +85,7 @@ const PdfViewer = ({
 
         if (card.id === "72V55XJap3h5hTBfw3qs") {
           // Main package
-          coveragesText += `All-in-One Package (Septic Major Component Plan): $${price.toFixed(
+          coveragesText += `Septic Major Component Plan: $${price.toFixed(
             2
           )}/month for ${duration}\n`;
           totalMonthlyCost += price;
@@ -129,7 +129,8 @@ const PdfViewer = ({
       if (selected[index]) {
         const displayName =
           card.id === "72V55XJap3h5hTBfw3qs"
-            ? "All-in-One Package (Septic Major Component Plan)"
+            // ? "All-in-One Package (Septic Major Component Plan)"
+                    ? "Septic Major Component Plan"
             : card.title;
         componentsText += `${displayName}\n`;
       }

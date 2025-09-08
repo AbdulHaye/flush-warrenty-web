@@ -876,19 +876,22 @@ function Agreement() {
                             <label className="text-xs text-gray-600 mr-2">
                               Contract for
                             </label>
-                            <select
-                              value={duration}
-                              onChange={(e) =>
-                                handleDurationChange(card.id, e.target.value)
-                              }
-                              className="text-xs text-gray-600 border rounded p-1"
-                            >
-                              {durationOptions.map((dur) => (
-                                <option key={dur} value={dur}>
-                                  {dur}
-                                </option>
-                              ))}
-                            </select>
+                          <select
+  value={duration}
+  onChange={(e) => handleDurationChange(card.id, e.target.value)}
+  className="text-xs text-gray-600 border rounded p-1"
+>
+  {durationOptions
+    .filter((dur) => {
+      const priceForDuration = getPriceForPlan(card.id, dur);
+      return priceForDuration > 0; // Only show options with price > 0
+    })
+    .map((dur) => (
+      <option key={dur} value={dur}>
+        {dur}
+      </option>
+    ))}
+</select>
                           </div>
                         </div>
                       </div>

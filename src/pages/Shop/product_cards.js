@@ -22,13 +22,13 @@ const productCards = [
       "Provides regular septic maintenance and essential services to prevent costly emergencies, with priority service for faster response times.",
     note: "Eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "$12/month: Includes pumping every three years.",
-          "$17/month: Includes pumping every two years."
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "$12/month: Includes pumping every three years.",
+      //     "$17/month: Includes pumping every two years."
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
@@ -75,13 +75,13 @@ const productCards = [
       "Comprehensive protection for your septic system, covering all major components at an affordable monthly rate.",
     note: "Final pricing and eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "Starting Price: $25/month",
-          "Final price and eligibility determined after inspection.",
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "Starting Price: $25/month",
+      //     "Final price and eligibility determined after inspection.",
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
@@ -122,13 +122,13 @@ const productCards = [
       "Protects against failures in the leaching field and related issues.",
     note: "Final pricing and eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "Starting Price: $18/month",
-          "Final price and eligibility determined after inspection.",
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "Starting Price: $18/month",
+      //     "Final price and eligibility determined after inspection.",
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
@@ -169,14 +169,14 @@ const productCards = [
       "Protects against mechanical failures and malfunctions in your ejector pump system.",
     note: "Eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "36 Months: $4.99/month",
-          "72 Months: $7.99/month",
-          "108 Months: $10.99/month",
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "36 Months: $4.99/month",
+      //     "72 Months: $7.99/month",
+      //     "108 Months: $10.99/month",
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
@@ -218,13 +218,13 @@ const productCards = [
       "Protects against tank structural failures, broken baffles, and other major issues.",
     note: "Eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "Starting Price: $18/month",
-          "Final price and eligibility determined after inspection."
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "Starting Price: $18/month",
+      //     "Final price and eligibility determined after inspection."
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
@@ -263,14 +263,14 @@ const productCards = [
       "Protects against cracks, aging pipes, and tree root damage.",
     note: "Eligibility contingent on inspection.",
     sections: [
-      {
-        heading: "Monthly Terms",
-        content: [
-          "36 Months: $7.99/month",
-          "72 Months: $9.99/month",
-          "108 Months: $14.99/month"
-        ],
-      },
+      // {
+      //   heading: "Monthly Terms",
+      //   content: [
+      //     "36 Months: $7.99/month",
+      //     "72 Months: $9.99/month",
+      //     "108 Months: $14.99/month"
+      //   ],
+      // },
       {
         heading: "Why It Matters",
         content: {
