@@ -184,7 +184,8 @@ const PdfViewer = ({
           card.sections[2]?.content[0] || "No deductible information";
         const displayName =
           card.id === "72V55XJap3h5hTBfw3qs"
-            ? "All-in-One Package"
+            // ? "All-in-One Package"
+             ? "Septic Major Component Plan"
             : card.title;
         serviceFeesText += `${displayName}: ${deductibleInfo}\n`;
       }
@@ -218,7 +219,8 @@ const PdfViewer = ({
       notSelectedNonPumping.forEach((card, index) => {
         const displayName =
           card.id === "72V55XJap3h5hTBfw3qs"
-            ? "All-in-One Package"
+            // ? "All-in-One Package"
+               ? "Septic Major Component Plan"
             : card.title;
         resultText += `${index + 1}. ${displayName}\n`;
       });

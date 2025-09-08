@@ -91,7 +91,7 @@ const productCards = [
             "Sewer Pipe Coverage",
             "Septic Tank Coverage",
             "Leaching Field Coverage",
-            "Ejector Pump Coverage",
+            // "Ejector Pump Coverage",
             "Transferability: Coverage can be transferred to the next homeowner",
           ],
         },
