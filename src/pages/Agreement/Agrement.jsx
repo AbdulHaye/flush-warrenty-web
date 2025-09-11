@@ -143,6 +143,7 @@ function Agreement() {
   const [pdfReady, setPdfReady] = useState(false);
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
   const [minLoading, setMinLoading] = useState(true);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
@@ -237,9 +238,9 @@ function Agreement() {
       filteredCards.forEach((card) => {
         const fieldValue = getCustomFieldValue(card.id);
         const availableDurations = Object.keys(card.priceFieldIds);
-        
+
         // Filter out durations with $0 price
-        const nonZeroDurations = availableDurations.filter(duration => {
+        const nonZeroDurations = availableDurations.filter((duration) => {
           const price = getPriceForPlan(card.id, duration);
           return price > 0;
         });
@@ -259,6 +260,7 @@ function Agreement() {
       setError(err.message);
     } finally {
       setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -582,6 +584,29 @@ function Agreement() {
     }));
   };
 
+  useEffect(() => {
+    if (contactData) {
+      const newDurations = {};
+      filteredProductCards.forEach((card) => {
+        const nonZeroDurations = Object.keys(card.priceFieldIds).filter(
+          (duration) => {
+            const price = getPriceForPlan(card.id, duration);
+            return price > 0;
+          }
+        );
+
+        if (nonZeroDurations.length > 0 && !selectedDurations[card.id]) {
+          newDurations[card.id] = nonZeroDurations[0];
+        }
+      });
+
+      if (Object.keys(newDurations).length > 0) {
+        setSelectedDurations((prev) => ({ ...prev, ...newDurations }));
+      }
+      setDataLoading(false);
+    }
+  }, [contactData, filteredProductCards]);
+
   const toggleSelection = (index) => {
     const selectedCount = selected.filter((isSelected) => isSelected).length;
     if (selectedCount <= 1 && selected[index]) {
@@ -847,108 +872,114 @@ function Agreement() {
             Verify Your Plan Details
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 px-8 mx-auto justify-center">
-            {filteredProductCards.map((card, i) => {
-              const duration = selectedDurations[card.id] || "36 Months";
-              const price = extractPrice(card.id, duration);
-              
-              // Filter out durations with $0 price
-              const durationOptions = Object.keys(card.priceFieldIds).filter(dur => {
-                const price = getPriceForPlan(card.id, dur);
-                return price > 0;
-              });
+            {!dataLoading &&
+              filteredProductCards.map((card, i) => {
+                const durationOptions = Object.keys(card.priceFieldIds).filter(
+                  (dur) => {
+                    const price = getPriceForPlan(card.id, dur);
+                    return price > 0;
+                  }
+                );
 
-              const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+                const duration =
+                  selectedDurations[card.id] ||
+                  (durationOptions.length > 0
+                    ? durationOptions[0]
+                    : "36 Months");
+                const price = extractPrice(card.id, duration);
 
-              return (
-                <div
-                  key={i}
-                  className={`relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border ${
-                    selected[i] ? "border-blue-500" : "border-gray-300"
-                  } w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]`}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <img
-                      className="w-12 h-12"
-                      src={card.image}
-                      alt={card.title}
-                    />
-                    {isMajorPlanSelected && isSubPlan ? (
-                      <div className="text-right">
-                        <p className="text-sm text-green-600 font-medium">
-                          Included in Major Plan
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-right">
-                        <p className="text-xs text-gray-600">Starting From</p>
-                        <div>
-                          <h3 className="text-3xl font-bold text-gray-900">
-                            ${price.toFixed(2)}
-                          </h3>
-                          <div className="flex items-center justify-end mt-1">
-                            <label className="text-xs text-gray-600 mr-2">
-                              Contract for
-                            </label>
+                const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
 
-                            <select
-                              value={duration}
-                              onChange={(e) =>
-                                handleDurationChange(card.id, e.target.value)
-                              }
-                              className="text-xs text-gray-600 border rounded p-1"
-                            >
-                              {durationOptions.map((dur) => (
-                                <option key={dur} value={dur}>
-                                  {dur}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-blue-600 text-lg font-medium mb-2">
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-800 text-sm mb-1">
-                    {card.description}
-                  </p>
-                  <div className="flex-1">
-                    {card.sections.map((section, j) => (
-                      <div key={j} className="border-t border-gray-300 py-3">
-                        <div
-                          className="flex justify-between items-center cursor-pointer"
-                          onClick={() => toggle(i, j)}
-                        >
-                          <h4 className="text-lg font-semibold text-gray-900">
-                            {section.heading}
-                          </h4>
-                          <IoIosArrowDown
-                            className={`transform transition-transform duration-300 ${
-                              openItems[i] === j ? "rotate-180" : ""
-                            }`}
-                          />
-                        </div>
-                        {openItems[i] === j && (
-                          <div className="mt-2">
-                            {renderContent(section.content)}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => toggleSelection(i)}
-                    className={`w-full py-2 rounded-lg font-medium mt-auto ${
-                      selected[i] ? "proceed-button" : "select-button"
-                    }`}
+                return (
+                  <div
+                    key={i}
+                    className={`relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border ${
+                      selected[i] ? "border-blue-500" : "border-gray-300"
+                    } w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]`}
                   >
-                    {selected[i] ? "Selected" : "Select"}
-                  </button>
-                </div>
-              );
-            })}
+                    <div className="flex justify-between items-center mb-4">
+                      <img
+                        className="w-12 h-12"
+                        src={card.image}
+                        alt={card.title}
+                      />
+                      {isMajorPlanSelected && isSubPlan ? (
+                        <div className="text-right">
+                          <p className="text-sm text-green-600 font-medium">
+                            Included in Major Plan
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-right">
+                          <p className="text-xs text-gray-600">Starting From</p>
+                          <div>
+                            <h3 className="text-3xl font-bold text-gray-900">
+                              ${price.toFixed(2)}
+                            </h3>
+                            <div className="flex items-center justify-end mt-1">
+                              <label className="text-xs text-gray-600 mr-2">
+                                Contract for
+                              </label>
+
+                              <select
+                                value={duration}
+                                onChange={(e) =>
+                                  handleDurationChange(card.id, e.target.value)
+                                }
+                                className="text-xs text-gray-600 border rounded p-1"
+                              >
+                                {durationOptions.map((dur) => (
+                                  <option key={dur} value={dur}>
+                                    {dur}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-blue-600 text-lg font-medium mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-gray-800 text-sm mb-1">
+                      {card.description}
+                    </p>
+                    <div className="flex-1">
+                      {card.sections.map((section, j) => (
+                        <div key={j} className="border-t border-gray-300 py-3">
+                          <div
+                            className="flex justify-between items-center cursor-pointer"
+                            onClick={() => toggle(i, j)}
+                          >
+                            <h4 className="text-lg font-semibold text-gray-900">
+                              {section.heading}
+                            </h4>
+                            <IoIosArrowDown
+                              className={`transform transition-transform duration-300 ${
+                                openItems[i] === j ? "rotate-180" : ""
+                              }`}
+                            />
+                          </div>
+                          {openItems[i] === j && (
+                            <div className="mt-2">
+                              {renderContent(section.content)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => toggleSelection(i)}
+                      className={`w-full py-2 rounded-lg font-medium mt-auto ${
+                        selected[i] ? "proceed-button" : "select-button"
+                      }`}
+                    >
+                      {selected[i] ? "Selected" : "Select"}
+                    </button>
+                  </div>
+                );
+              })}
           </div>
         </div>
 
