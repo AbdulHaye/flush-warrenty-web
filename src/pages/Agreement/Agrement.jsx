@@ -232,16 +232,23 @@ function Agreement() {
       });
       setSelected(Array(filteredCards.length).fill(true));
 
-      // Initialize durations
+      // Initialize durations - only show options with non-zero prices
       const initialDurations = {};
       filteredCards.forEach((card) => {
         const fieldValue = getCustomFieldValue(card.id);
         const availableDurations = Object.keys(card.priceFieldIds);
+        
+        // Filter out durations with $0 price
+        const nonZeroDurations = availableDurations.filter(duration => {
+          const price = getPriceForPlan(card.id, duration);
+          return price > 0;
+        });
+
         if (fieldValue && fieldValue.includes("Months")) {
-          if (availableDurations.includes(fieldValue)) {
+          if (nonZeroDurations.includes(fieldValue)) {
             initialDurations[card.id] = fieldValue;
-          } else if (availableDurations.length > 0) {
-            initialDurations[card.id] = availableDurations[0];
+          } else if (nonZeroDurations.length > 0) {
+            initialDurations[card.id] = nonZeroDurations[0];
           } else {
             initialDurations[card.id] = "36 Months";
           }
@@ -843,7 +850,13 @@ function Agreement() {
             {filteredProductCards.map((card, i) => {
               const duration = selectedDurations[card.id] || "36 Months";
               const price = extractPrice(card.id, duration);
-              const durationOptions = Object.keys(card.priceFieldIds);
+              
+              // Filter out durations with $0 price
+              const durationOptions = Object.keys(card.priceFieldIds).filter(dur => {
+                const price = getPriceForPlan(card.id, dur);
+                return price > 0;
+              });
+
               const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
 
               return (
