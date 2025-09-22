@@ -743,7 +743,7 @@ function Agreement() {
   return (
     <>
       <Navbar />
-      <div className="w-full max-w-screen-lg mx-auto my-15 p-4">
+ <div className="agreement-main-container w-full max-w-screen-lg mx-auto my-15 p-4">
         <div className="text-center mb-[50px]">
           <h3 className="text-[32px] font-bold leading-[44px] mb-[15px] text-black">
             Agreement Information
@@ -869,7 +869,7 @@ function Agreement() {
 
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            Verify Your Plan Details
+           Select Your Coverage
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 px-8 mx-auto justify-center">
             {!dataLoading &&

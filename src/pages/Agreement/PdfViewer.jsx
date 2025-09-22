@@ -350,39 +350,37 @@ const PdfViewer = ({
     };
   }, [contactData, signatureData, selected, selectedDurations]);
 
-  return (
-    <div className="pdf-viewer-container relative">
-      {isLoading ? (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{ backgroundColor: "#1f78bc" }}
-        >
-          <Loader />
+// In PdfViewer component, replace the return statement with this:
+return (
+  <div className="pdf-viewer-container">
+    {isLoading ? (
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "#1f78bc" }}>
+        <Loader />
+      </div>
+    ) : pdfUrl ? (
+      <>
+        <iframe
+          ref={iframeRef}
+          title="PDF Viewer"
+          src={`${pdfUrl}#toolbar=0&navpanes=0`}
+          width="100%"
+          height="600px"
+          style={{ border: "none" }}
+        />
+        <div className="pdf-viewer-buttons">
+          <button onClick={handlePrint} className="btn btn-primary">
+            Print Preview
+          </button>
+          <button onClick={handleDownload} className="btn btn-secondary">
+            Download Contract
+          </button>
         </div>
-      ) : pdfUrl ? (
-        <>
-          <iframe
-            ref={iframeRef}
-            title="PDF Viewer"
-            src={`${pdfUrl}#toolbar=0&navpanes=0`}
-            width="100%"
-            height="600px"
-            style={{ border: "none" }}
-          />
-          <div className="flex justify-center gap-4 mt-4">
-            <button onClick={handlePrint} className="btn btn-primary">
-              Print Preview
-            </button>
-            <button onClick={handleDownload} className="btn btn-secondary">
-              Download Contract
-            </button>
-          </div>
-        </>
-      ) : (
-        <div>Error loading PDF. Please try again.</div>
-      )}
-    </div>
-  );
+      </>
+    ) : (
+      <div>Error loading PDF. Please try again.</div>
+    )}
+  </div>
+)
 };
 
 export default PdfViewer;

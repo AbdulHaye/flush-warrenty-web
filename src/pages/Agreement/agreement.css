@@ -1,152 +1,188 @@
-.agreement-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: start;
-    gap: 2rem;
+/* agreement.css - COMPLETE FIX */
+
+/* Reset and base styles */
+.agreement-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
 }
 
+.agreement-main-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.agreement-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: start;
+  gap: 2rem;
+  width: 100%;
+}
 
 .details {
-    display: flex;
-    flex-wrap: WRAP;
-    justify-content: space-between;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 100%;
 }
 
 .details p {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 5px 0;
-    border: 1px solid #00000063;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 5px 0;
+  border: 1px solid #00000063;
 }
 
 .heading {
-    text-align: left;
-    font-size: 28px;
-    margin-top: 30px;
-    width: 100%;
+  text-align: left;
+  font-size: 28px;
+  margin-top: 30px;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
-    .agreement-container {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-
-
-/* PDF Preview Styles */
+/* PDF Preview Container - FIXED */
 .pdf-preview-container {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  padding: 0;
 }
 
-/* Signature Pad Styles */
+/* PDF Viewer Container - COMPLETELY FIXED */
+.pdf-viewer-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pdf-viewer-container iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 600px;
+  display: block;
+  margin: 0 auto;
+  border: none;
+}
+
+/* PDF Viewer Buttons */
+.pdf-viewer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+}
+
+/* Signature Styles */
 .signature-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #f7fbff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f7fbff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .signature-pad-container {
-    border: 1px solid #ddd;
-    background: white;
-    margin-bottom: 15px;
+  border: 1px solid #ddd;
+  background: white;
+  margin-bottom: 15px;
 }
 
 .signature-canvas {
-    width: 100%;
-    height: 200px;
+  width: 100%;
+  height: 200px;
 }
 
 .signature-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
 /* Button Styles */
 .btn {
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .btn-primary {
-    background-color: #2563eb;
-    color: white;
-    border: none;
+  background-color: #2563eb;
+  color: white;
+  border: none;
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
+  background-color: #1d4ed8;
 }
 
 .btn-secondary {
-    background-color: #f3f4f6;
-    color: #111827;
-    border: 1px solid #d1d5db;
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
 }
 
 .btn-secondary:hover {
-    background-color: #e5e7eb;
+  background-color: #e5e7eb;
 }
 
-
-
-
-
-.pdf-viewer-container {
-    margin: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-
-
-/* Add these styles to your agreement.css file */
+/* Editable Fields */
 .editable-field {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .editable-field strong {
-    min-width: 100px;
-    display: inline-block;
+  min-width: 100px;
+  display: inline-block;
 }
 
 .editable-input {
-    border: none;
-    background: transparent;
-    padding: 5px;
-    margin-left: 10px;
-    flex-grow: 1;
-    outline: none;
-    transition: border-color 0.3s;
-    text-align: right;
+  border: none;
+  background: transparent;
+  padding: 5px;
+  margin-left: 10px;
+  flex-grow: 1;
+  outline: none;
+  transition: border-color 0.3s;
+  text-align: right;
 }
 
 .editable-input:focus {
-    border-bottom-color: #4a90e2;
+  border-bottom-color: #4a90e2;
 }
 
 .select-button {
@@ -177,4 +213,114 @@
 
 .proceed-button:hover {
   background-color: #047857;
+}
+
+/* RESPONSIVE DESIGN - FIXED FOR ALL DEVICES */
+@media (max-width: 900px) {
+  .agreement-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .agreement-main-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agreement-main-container {
+    padding: 10px;
+  }
+  
+  .pdf-viewer-container iframe {
+    height: 500px;
+  }
+  
+  .pdf-viewer-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .pdf-viewer-buttons .btn {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+/* iPhone SE */
+@media (max-width: 375px) {
+  .agreement-main-container {
+    padding: 5px;
+  }
+  
+  .pdf-viewer-container iframe {
+    height: 400px;
+  }
+  
+  .details {
+    padding: 15px;
+  }
+  
+  .details p {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .editable-input {
+    margin-left: 0;
+    margin-top: 5px;
+    width: 100%;
+  }
+}
+
+/* Pixel 7, Samsung S20 Ultra */
+@media (max-width: 412px) {
+  .agreement-main-container {
+    padding: 8px;
+  }
+  
+  .pdf-viewer-container iframe {
+    height: 450px;
+  }
+}
+
+/* iPad Mini */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .pdf-viewer-container iframe {
+    height: 700px;
+  }
+}
+
+/* iPad Pro */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .pdf-viewer-container iframe {
+    height: 800px;
+  }
+}
+
+/* Surface Pro 7, Asus Zenbook Fold */
+@media (min-width: 912px) and (max-width: 1280px) {
+  .pdf-viewer-container iframe {
+    height: 750px;
+  }
+}
+
+/* Force center alignment for critical elements */
+.agreement-wrapper * {
+  box-sizing: border-box;
+}
+
+.agreement-main-container > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Ensure PDF is always centered */
+.pdf-preview-container,
+.pdf-viewer-container,
+.pdf-viewer-container iframe {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
 }
