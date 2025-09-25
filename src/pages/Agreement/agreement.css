@@ -58,6 +58,21 @@
   width: 100%;
 }
 
+/* Popular Badge Styles */
+.popular-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #059669;
+  color: white;
+  padding: 4px 12px;
+  border-top-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 10;
+}
+
 /* PDF Preview Container - FIXED */
 .pdf-preview-container {
   width: 100%;

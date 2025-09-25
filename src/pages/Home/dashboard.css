@@ -35,6 +35,20 @@
   margin-bottom: 20px;
 }
 
+/* Popular Badge Styles */
+.popular-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #059669;
+  color: white;
+  padding: 4px 12px;
+  border-top-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 10;
+}
 
 /* Updated Styles for Logout Button */
 .dashboard-logout-btn {
@@ -51,7 +65,6 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 
 .dashboard-title {
   text-align: center;
@@ -78,10 +91,10 @@
   background: linear-gradient(to right, #2563eb, #60a5fa);
   border-radius: 2px;
 }
+
 .dashboard-logout-btn:hover {
   background-color: #1d4ed8; /* Match primary button hover */
 }
-
 
 @media (max-width: 640px) {
   .dashboard-title {
@@ -102,7 +115,6 @@
   }
 }
 
-
 @media (min-width: 641px) and (max-width: 1024px) {
   .dashboard-title {
     font-size: 3.5rem;
@@ -120,6 +132,5 @@
   padding: 8px 16px;
   border-radius: 9999px;
   border: none;
-
   transition: background-color 0.3s;
 }

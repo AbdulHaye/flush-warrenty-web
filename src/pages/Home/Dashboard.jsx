@@ -196,12 +196,18 @@ function Dashboard() {
               const duration = extractDuration(card.id);
               const price = extractPrice(card.id, duration);
               const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+              const isPopularPlan = card.id === MAIN_PACKAGE_ID;
 
               return (
                 <div
                   key={i}
                   className="relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border border-blue-500 w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]"
                 >
+                  {/* Popular Badge */}
+                  {isPopularPlan && (
+                    <div className="popular-badge">Popular</div>
+                  )}
+                  
                   <div className="flex justify-between items-center mb-4">
                     <img
                       className="w-12 h-12"

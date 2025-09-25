@@ -909,6 +909,7 @@ function Agreement() {
                 const price = extractPrice(card.id, duration);
 
                 const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+                const isPopularPlan = card.id === MAIN_PACKAGE_ID;
 
                 return (
                   <div
@@ -917,6 +918,11 @@ function Agreement() {
                       selected[i] ? "border-blue-500" : "border-gray-300"
                     } w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]`}
                   >
+                    {/* Popular Badge */}
+                    {isPopularPlan && (
+                      <div className="popular-badge">Popular</div>
+                    )}
+                    
                     <div className="flex justify-between items-center mb-4">
                       <img
                         className="w-12 h-12"
@@ -1052,45 +1058,45 @@ function Agreement() {
                 PDF is being processed. Please wait.
               </div>
             )}
-       <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg">
-  <div className="text-lg font-semibold">
-    <div className="mb-2">
-      Subtotal: <span className="text-blue-600">${subtotal.toFixed(2)}</span>
-    </div>
-    <div className="mb-2">
-      Tax (6.35%): <span className="text-blue-600">${tax.toFixed(2)}</span>
-      {filteredProductCards.some((card, index) => 
-        card.id === MAINTENANCE_PLAN_ID && selected[index]
-      ) && (
-        <span className="text-xs text-gray-600 ml-2">
-          (Maintenance Plan tax excluded)
-        </span>
-      )}
-    </div>
-    <div className="text-xl">
-      Total Payment: <span className="text-blue-600">${totalPayment.toFixed(2)}</span>
-    </div>
-  </div>
-  <button
-    onClick={handlePayout}
-    className={`btn px-6 py-3 text-lg ${
-      totalPayment === 0 ||
-      !signatureData ||
-      !pdfReady ||
-      isPaymentProcessing
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-blue-600 hover:bg-blue-700"
-    } text-white`}
-    disabled={
-      totalPayment === 0 ||
-      !signatureData ||
-      !pdfReady ||
-      isPaymentProcessing
-    }
-  >
-    {isPaymentProcessing ? "Processing..." : "Proceed to Payment"}
-  </button>
-</div>
+            <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg">
+              <div className="text-lg font-semibold">
+                <div className="mb-2">
+                  Subtotal: <span className="text-blue-600">${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="mb-2">
+                  Tax (6.35%): <span className="text-blue-600">${tax.toFixed(2)}</span>
+                  {filteredProductCards.some((card, index) => 
+                    card.id === MAINTENANCE_PLAN_ID && selected[index]
+                  ) && (
+                    <span className="text-xs text-gray-600 ml-2">
+                      (Maintenance Plan tax excluded)
+                    </span>
+                  )}
+                </div>
+                <div className="text-xl">
+                  Total Payment: <span className="text-blue-600">${totalPayment.toFixed(2)}</span>
+                </div>
+              </div>
+              <button
+                onClick={handlePayout}
+                className={`btn px-6 py-3 text-lg ${
+                  totalPayment === 0 ||
+                  !signatureData ||
+                  !pdfReady ||
+                  isPaymentProcessing
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white`}
+                disabled={
+                  totalPayment === 0 ||
+                  !signatureData ||
+                  !pdfReady ||
+                  isPaymentProcessing
+                }
+              >
+                {isPaymentProcessing ? "Processing..." : "Proceed to Payment"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
