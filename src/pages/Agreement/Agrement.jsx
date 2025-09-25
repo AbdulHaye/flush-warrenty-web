@@ -24,6 +24,8 @@ const SUB_PACKAGE_IDS = [
   "PnJyfsKECatzdFkbXT4N", // Septic Tank Coverage
   "8PKKH94jrOHDhB3oq5lN", // Sewer Pipe Coverage
 ];
+const MAINTENANCE_PLAN_ID = "Wv9QwWG0VpcIUBsDk08J"; // Maintenance Plan ID
+const TAX_RATE = 0.0635;
 
 // Function to fetch token from GHL Custom Values
 const fetchTokenFromGHL = async () => {
@@ -158,7 +160,8 @@ function Agreement() {
     billingPhone: "",
     billingEmail: "",
   });
-
+  const [subtotal, setSubtotal] = useState(0);
+  const [tax, setTax] = useState(0);
   // Ref to store pending updates
   const pendingUpdatesRef = useRef({});
 
@@ -440,11 +443,16 @@ function Agreement() {
       .map((card) => {
         const duration = selectedDurations[card.id] || "36 Months";
         const price = extractPrice(card.id, duration);
+        const isTaxable = card.id !== MAINTENANCE_PLAN_ID;
+        const planTax = isTaxable ? price * TAX_RATE : 0;
+
         return {
           id: card.id,
           title: card.title,
           price: `$${price.toFixed(2)}/Month for ${duration}`,
           monthlyCost: price,
+          tax: planTax,
+          isTaxable,
           duration,
         };
       });
@@ -453,6 +461,8 @@ function Agreement() {
       navigate("/payment-method", {
         state: {
           selectedPlans,
+          subtotal,
+          tax,
           totalPayment,
           contactData: editableFields,
           contactId: id,
@@ -560,29 +570,39 @@ function Agreement() {
     return fieldValue && fieldValue.includes("Months");
   });
 
+  // Replace the payment calculation useEffect with this:
   useEffect(() => {
     const mainPackageIndex = filteredProductCards.findIndex(
       (card) => card.id === MAIN_PACKAGE_ID
     );
     const isMainPackageSelected =
       mainPackageIndex !== -1 && selected[mainPackageIndex];
-    const total = filteredProductCards
-      .filter((card, index) => selected[index])
-      .reduce((sum, card) => {
-        if (isMainPackageSelected && SUB_PACKAGE_IDS.includes(card.id))
-          return sum;
+
+    let calculatedSubtotal = 0;
+    let calculatedTax = 0;
+
+    filteredProductCards.forEach((card, index) => {
+      if (selected[index]) {
+        if (isMainPackageSelected && SUB_PACKAGE_IDS.includes(card.id)) {
+          return;
+        }
+
         const duration = selectedDurations[card.id] || "36 Months";
-        return sum + extractPrice(card.id, duration);
-      }, 0);
+        const planPrice = extractPrice(card.id, duration);
+        calculatedSubtotal += planPrice;
+
+        // Add tax ONLY if it's NOT the Maintenance Plan
+        if (card.id !== MAINTENANCE_PLAN_ID) {
+          calculatedTax += planPrice * TAX_RATE;
+        }
+      }
+    });
+
+    const total = calculatedSubtotal + calculatedTax;
+    setSubtotal(calculatedSubtotal);
+    setTax(calculatedTax);
     setTotalPayment(total);
   }, [selected, selectedDurations, filteredProductCards, contactData]);
-
-  const toggle = (cardIndex, sectionIndex) => {
-    setOpenItems((prev) => ({
-      ...prev,
-      [cardIndex]: prev[cardIndex] === sectionIndex ? null : sectionIndex,
-    }));
-  };
 
   useEffect(() => {
     if (contactData) {
@@ -743,7 +763,7 @@ function Agreement() {
   return (
     <>
       <Navbar />
- <div className="agreement-main-container w-full max-w-screen-lg mx-auto my-15 p-4">
+      <div className="agreement-main-container w-full max-w-screen-lg mx-auto my-15 p-4">
         <div className="text-center mb-[50px]">
           <h3 className="text-[32px] font-bold leading-[44px] mb-[15px] text-black">
             Agreement Information
@@ -869,7 +889,7 @@ function Agreement() {
 
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6 text-center">
-           Select Your Coverage
+            Select Your Coverage
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 px-8 mx-auto justify-center">
             {!dataLoading &&
@@ -1032,33 +1052,45 @@ function Agreement() {
                 PDF is being processed. Please wait.
               </div>
             )}
-            <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg">
-              <div className="text-xl font-semibold">
-                Total Payment:{" "}
-                <span className="text-blue-600">
-                  ${totalPayment.toFixed(2)}
-                </span>
-              </div>
-              <button
-                onClick={handlePayout}
-                className={`btn px-6 py-3 text-lg ${
-                  totalPayment === 0 ||
-                  !signatureData ||
-                  !pdfReady ||
-                  isPaymentProcessing
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                } text-white`}
-                disabled={
-                  totalPayment === 0 ||
-                  !signatureData ||
-                  !pdfReady ||
-                  isPaymentProcessing
-                }
-              >
-                {isPaymentProcessing ? "Processing..." : "Proceed to Payment"}
-              </button>
-            </div>
+       <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg">
+  <div className="text-lg font-semibold">
+    <div className="mb-2">
+      Subtotal: <span className="text-blue-600">${subtotal.toFixed(2)}</span>
+    </div>
+    <div className="mb-2">
+      Tax (6.35%): <span className="text-blue-600">${tax.toFixed(2)}</span>
+      {filteredProductCards.some((card, index) => 
+        card.id === MAINTENANCE_PLAN_ID && selected[index]
+      ) && (
+        <span className="text-xs text-gray-600 ml-2">
+          (Maintenance Plan tax excluded)
+        </span>
+      )}
+    </div>
+    <div className="text-xl">
+      Total Payment: <span className="text-blue-600">${totalPayment.toFixed(2)}</span>
+    </div>
+  </div>
+  <button
+    onClick={handlePayout}
+    className={`btn px-6 py-3 text-lg ${
+      totalPayment === 0 ||
+      !signatureData ||
+      !pdfReady ||
+      isPaymentProcessing
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700"
+    } text-white`}
+    disabled={
+      totalPayment === 0 ||
+      !signatureData ||
+      !pdfReady ||
+      isPaymentProcessing
+    }
+  >
+    {isPaymentProcessing ? "Processing..." : "Proceed to Payment"}
+  </button>
+</div>
           </div>
         </div>
       </div>
