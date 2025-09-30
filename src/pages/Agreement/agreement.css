@@ -339,3 +339,77 @@
   margin-right: auto !important;
   display: block !important;
 }
+
+
+
+/* PDF Viewer Mobile Fixes */
+.pdf-viewer-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.pdf-iframe-container {
+  position: relative;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* iOS Specific Fixes */
+@supports (-webkit-touch-callout: none) {
+  .pdf-iframe-container {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-scrolling: touch !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .pdf-iframe-container {
+    height: 60vh !important;
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .pdf-viewer-buttons {
+    flex-direction: column;
+    padding: 0 1rem;
+  }
+  
+  .pdf-viewer-buttons .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-iframe-container {
+    height: 50vh !important;
+  }
+}
+
+/* Ensure proper scrolling on all devices */
+.pdf-iframe-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pdf-iframe-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.pdf-iframe-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.pdf-iframe-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

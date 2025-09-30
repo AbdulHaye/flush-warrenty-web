@@ -15,6 +15,7 @@ const PdfViewer = ({
   const [pdfUrl, setPdfUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const iframeRef = useRef(null);
+  const containerRef = useRef(null);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -306,6 +307,22 @@ const PdfViewer = ({
     };
   }, [contactData, signatureData, selected, selectedDurations]);
 
+  // Add iOS-specific scrolling fix
+  useEffect(() => {
+    const handleTouchMove = (e) => {
+      // Allow natural scrolling on iOS
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('touchmove', handleTouchMove, { passive: true });
+      
+      return () => {
+        container.removeEventListener('touchmove', handleTouchMove);
+      };
+    }
+  }, []);
+
   return (
     <div className="pdf-viewer-container">
       {isLoading ? (
@@ -314,32 +331,47 @@ const PdfViewer = ({
         </div>
       ) : pdfUrl ? (
         <>
-          {/* FIXED: Added responsive container with scrolling */}
-          <div className="pdf-iframe-container" style={{ 
-            width: '100%', 
-            height: '600px', 
-            overflow: 'auto',
-            border: '1px solid #ccc',
-            borderRadius: '8px'
-          }}>
+          {/* FIXED: Improved iOS scrolling container */}
+          <div 
+            ref={containerRef}
+            className="pdf-iframe-container"
+            style={{ 
+              width: '100%', 
+              height: '70vh', // Use viewport height for better mobile experience
+              overflow: 'auto',
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              WebkitOverflowScrolling: 'touch', // iOS momentum scrolling
+              overscrollBehavior: 'contain',
+              backgroundColor: '#f5f5f5'
+            }}
+          >
             <iframe
               ref={iframeRef}
               title="PDF Viewer"
-              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
               width="100%"
               height="100%"
               style={{ 
                 border: "none",
-                minHeight: '600px'
+                minHeight: '800px', // Ensure enough height for content
+                display: 'block'
               }}
               loading="lazy"
+              allowFullScreen
             />
           </div>
           <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4">
-            <button onClick={handlePrint} className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <button 
+              onClick={handlePrint} 
+              className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
               Print Preview
             </button>
-            <button onClick={handleDownload} className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+            <button 
+              onClick={handleDownload} 
+              className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
               Download Contract
             </button>
           </div>
