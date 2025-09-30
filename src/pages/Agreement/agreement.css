@@ -1,4 +1,4 @@
-/* agreement.css - COMPLETE FIX */
+/* agreement.css - COMPLETE FIX WITH iOS PDF SCROLLING */
 
 /* Reset and base styles */
 .agreement-wrapper {
@@ -83,7 +83,7 @@
   padding: 0;
 }
 
-/* PDF Viewer Container - COMPLETELY FIXED */
+/* PDF Viewer Container - iOS SCROLLING FIXED */
 .pdf-viewer-container {
   width: 100% !important;
   max-width: 100% !important;
@@ -96,6 +96,37 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* iOS PDF SCROLLING FIX - CRITICAL */
+.pdf-iframe-container.ios-scroll-fix {
+  -webkit-overflow-scrolling: touch !important;
+  overflow: auto !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.pdf-iframe-container.ios-scroll-fix iframe {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  pointer-events: auto !important;
+}
+
+/* Force scrolling on iOS */
+@supports (-webkit-touch-callout: none) {
+  .pdf-iframe-container {
+    -webkit-overflow-scrolling: touch !important;
+    overflow: auto !important;
+    height: 70vh !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    height: 100% !important;
+    min-height: 800px !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    pointer-events: auto !important;
+  }
 }
 
 .pdf-viewer-container iframe {
@@ -261,6 +292,16 @@
     width: 100%;
     max-width: 280px;
   }
+  
+  /* Mobile PDF fixes */
+  .pdf-iframe-container {
+    height: 60vh !important;
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }
 
 /* iPhone SE */
@@ -271,6 +312,10 @@
   
   .pdf-viewer-container iframe {
     height: 400px;
+  }
+  
+  .pdf-iframe-container {
+    height: 50vh !important;
   }
   
   .details {
@@ -298,12 +343,20 @@
   .pdf-viewer-container iframe {
     height: 450px;
   }
+  
+  .pdf-iframe-container {
+    height: 55vh !important;
+  }
 }
 
 /* iPad Mini */
 @media (min-width: 768px) and (max-width: 1024px) {
   .pdf-viewer-container iframe {
     height: 700px;
+  }
+  
+  .pdf-iframe-container {
+    height: 75vh !important;
   }
 }
 
@@ -312,12 +365,20 @@
   .pdf-viewer-container iframe {
     height: 800px;
   }
+  
+  .pdf-iframe-container {
+    height: 80vh !important;
+  }
 }
 
 /* Surface Pro 7, Asus Zenbook Fold */
 @media (min-width: 912px) and (max-width: 1280px) {
   .pdf-viewer-container iframe {
     height: 750px;
+  }
+  
+  .pdf-iframe-container {
+    height: 78vh !important;
   }
 }
 
@@ -340,59 +401,12 @@
   display: block !important;
 }
 
-
-
-/* PDF Viewer Mobile Fixes */
-.pdf-viewer-container {
-  width: 100%;
-  margin: 0 auto;
-}
-
-.pdf-iframe-container {
-  position: relative;
-  background: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* iOS Specific Fixes */
-@supports (-webkit-touch-callout: none) {
-  .pdf-iframe-container {
-    -webkit-overflow-scrolling: touch !important;
-    overflow-scrolling: touch !important;
-  }
-  
-  .pdf-iframe-container iframe {
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 768px) {
-  .pdf-iframe-container {
-    height: 60vh !important;
-    margin: 0 -1rem;
-    width: calc(100% + 2rem);
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-  }
-  
-  .pdf-viewer-buttons {
-    flex-direction: column;
-    padding: 0 1rem;
-  }
-  
-  .pdf-viewer-buttons .btn {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .pdf-iframe-container {
-    height: 50vh !important;
-  }
+/* Enhanced iOS PDF scrolling */
+.ios-scroll-fix {
+  -webkit-overflow-scrolling: touch !important;
+  overflow: auto !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Ensure proper scrolling on all devices */
@@ -412,4 +426,20 @@
 
 .pdf-iframe-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Critical iOS fixes */
+@supports (-webkit-touch-callout: none) {
+  .pdf-iframe-container {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-scrolling: touch !important;
+    height: 70vh !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 800px !important;
+  }
 }

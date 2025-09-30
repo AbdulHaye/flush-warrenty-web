@@ -307,7 +307,7 @@ const PdfViewer = ({
     };
   }, [contactData, signatureData, selected, selectedDurations]);
 
-  // Add iOS-specific scrolling fix
+  // Enhanced iOS scrolling fix
   useEffect(() => {
     const handleTouchMove = (e) => {
       // Allow natural scrolling on iOS
@@ -331,19 +331,20 @@ const PdfViewer = ({
         </div>
       ) : pdfUrl ? (
         <>
-          {/* FIXED: Improved iOS scrolling container */}
+          {/* FIXED: Enhanced iOS scrolling container */}
           <div 
             ref={containerRef}
-            className="pdf-iframe-container"
+            className="pdf-iframe-container ios-scroll-fix"
             style={{ 
               width: '100%', 
-              height: '70vh', // Use viewport height for better mobile experience
+              height: '70vh',
               overflow: 'auto',
               border: '1px solid #ccc',
               borderRadius: '8px',
-              WebkitOverflowScrolling: 'touch', // iOS momentum scrolling
+              WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
-              backgroundColor: '#f5f5f5'
+              backgroundColor: '#f5f5f5',
+              position: 'relative'
             }}
           >
             <iframe
@@ -354,11 +355,17 @@ const PdfViewer = ({
               height="100%"
               style={{ 
                 border: "none",
-                minHeight: '800px', // Ensure enough height for content
-                display: 'block'
+                minHeight: '800px',
+                display: 'block',
+                overflow: 'auto'
               }}
               loading="lazy"
               allowFullScreen
+              // iOS specific attributes
+              scrolling="yes"
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
+              allow="autoplay; fullscreen"
             />
           </div>
           <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4">
