@@ -565,6 +565,14 @@ function Agreement() {
     setSelectedDurations((prev) => ({ ...prev, [cardId]: duration }));
   };
 
+  // FIXED: Toggle function for dropdowns
+  const toggle = (cardIndex, sectionIndex) => {
+    setOpenItems(prev => ({
+      ...prev,
+      [cardIndex]: prev[cardIndex] === sectionIndex ? null : sectionIndex
+    }));
+  };
+
   const filteredProductCards = productCards.filter((card) => {
     const fieldValue = getCustomFieldValue(card.id);
     return fieldValue && fieldValue.includes("Months");

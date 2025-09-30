@@ -129,8 +129,7 @@ const PdfViewer = ({
       if (selected[index]) {
         const displayName =
           card.id === "72V55XJap3h5hTBfw3qs"
-            // ? "All-in-One Package (Septic Major Component Plan)"
-                    ? "Septic Major Component Plan"
+            ? "Septic Major Component Plan"
             : card.title;
         componentsText += `${displayName}\n`;
       }
@@ -176,6 +175,7 @@ const PdfViewer = ({
     }
     return notIncludedText;
   };
+
   const getServiceFeesDeductibles = () => {
     let serviceFeesText = "";
     filteredProductCards.forEach((card, index) => {
@@ -184,48 +184,13 @@ const PdfViewer = ({
           card.sections[2]?.content[0] || "No deductible information";
         const displayName =
           card.id === "72V55XJap3h5hTBfw3qs"
-            // ? "All-in-One Package"
-             ? "Septic Major Component Plan"
+            ? "Septic Major Component Plan"
             : card.title;
         serviceFeesText += `${displayName}: ${deductibleInfo}\n`;
       }
     });
     if (serviceFeesText === "") serviceFeesText += "No coverages selected\n";
     return serviceFeesText;
-  };
-
-  const getPumpingProducts = () => {
-    let pumpingProductsText = "";
-    filteredProductCards.forEach((card, index) => {
-      if (selected[index] && card.title.toLowerCase().includes("pump")) {
-        pumpingProductsText += `${card.title}\n`;
-      }
-    });
-    if (pumpingProductsText === "")
-      pumpingProductsText += "No pumping services selected\n";
-    return pumpingProductsText;
-  };
-
-  const getNonPumpingNotSelected = () => {
-    let resultText = "";
-    const notSelectedNonPumping = filteredProductCards.filter(
-      (card, index) =>
-        !selected[index] && !card.title.toLowerCase().includes("pump")
-    );
-    if (notSelectedNonPumping.length === 0) {
-      resultText = "All non-pumping products are selected";
-    } else {
-      resultText = "Not Selected\n";
-      notSelectedNonPumping.forEach((card, index) => {
-        const displayName =
-          card.id === "72V55XJap3h5hTBfw3qs"
-            // ? "All-in-One Package"
-               ? "Septic Major Component Plan"
-            : card.title;
-        resultText += `${index + 1}. ${displayName}\n`;
-      });
-    }
-    return resultText;
   };
 
   const getCurrentDateFormatted = () => {
@@ -240,8 +205,6 @@ const PdfViewer = ({
   const coveredComponentsText = getCoveredComponents();
   const notIncludedComponentsText = getNotIncludedComponents();
   const serviceFeesDeductiblesText = getServiceFeesDeductibles();
-  const pumpingServicesText = getPumpingProducts();
-  const nonPumpingNotIncludedText = getNonPumpingNotSelected();
   const currentDate = getCurrentDateFormatted();
 
   useEffect(() => {
@@ -265,7 +228,6 @@ const PdfViewer = ({
 
         const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
         form.updateFieldAppearances(helveticaFont);
-        console.log("Contact Data:", contactData);
 
         const setTextField = (name, value) => {
           try {
@@ -280,7 +242,6 @@ const PdfViewer = ({
         };
 
         setTextField("name", fullName);
-        console.log("Full Name:", fullName);
         setTextField("address", address);
         setTextField("date", date);
         setTextField("your_selected_coverages", coveragesText);
@@ -291,11 +252,6 @@ const PdfViewer = ({
         setTextField("covered_components", coveredComponentsText);
         setTextField("service_fees_deductibles", serviceFeesDeductiblesText);
         setTextField("not_included_covered", notIncludedComponentsText);
-        // setTextField("pumping_services_included", pumpingServicesText);
-        // setTextField(
-        //   "pumping_services_not_included",
-        //   nonPumpingNotIncludedText
-        // );
         setTextField("effective_date", currentDate);
         setTextField("full_name", billingName);
         setTextField("full_address", billingAddress);
@@ -350,37 +306,49 @@ const PdfViewer = ({
     };
   }, [contactData, signatureData, selected, selectedDurations]);
 
-// In PdfViewer component, replace the return statement with this:
-return (
-  <div className="pdf-viewer-container">
-    {isLoading ? (
-      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "#1f78bc" }}>
-        <Loader />
-      </div>
-    ) : pdfUrl ? (
-      <>
-        <iframe
-          ref={iframeRef}
-          title="PDF Viewer"
-          src={`${pdfUrl}#toolbar=0&navpanes=0`}
-          width="100%"
-          height="600px"
-          style={{ border: "none" }}
-        />
-        <div className="pdf-viewer-buttons">
-          <button onClick={handlePrint} className="btn btn-primary">
-            Print Preview
-          </button>
-          <button onClick={handleDownload} className="btn btn-secondary">
-            Download Contract
-          </button>
+  return (
+    <div className="pdf-viewer-container">
+      {isLoading ? (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "#1f78bc" }}>
+          <Loader />
         </div>
-      </>
-    ) : (
-      <div>Error loading PDF. Please try again.</div>
-    )}
-  </div>
-)
+      ) : pdfUrl ? (
+        <>
+          {/* FIXED: Added responsive container with scrolling */}
+          <div className="pdf-iframe-container" style={{ 
+            width: '100%', 
+            height: '600px', 
+            overflow: 'auto',
+            border: '1px solid #ccc',
+            borderRadius: '8px'
+          }}>
+            <iframe
+              ref={iframeRef}
+              title="PDF Viewer"
+              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+              width="100%"
+              height="100%"
+              style={{ 
+                border: "none",
+                minHeight: '600px'
+              }}
+              loading="lazy"
+            />
+          </div>
+          <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4">
+            <button onClick={handlePrint} className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              Print Preview
+            </button>
+            <button onClick={handleDownload} className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+              Download Contract
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="text-center text-red-600 p-4">Error loading PDF. Please try again.</div>
+      )}
+    </div>
+  );
 };
 
 export default PdfViewer;
