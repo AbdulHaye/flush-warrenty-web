@@ -164,10 +164,25 @@ function Agreement() {
   const [tax, setTax] = useState(0);
   // Ref to store pending updates
   const pendingUpdatesRef = useRef({});
+  const [isMobile, setIsMobile] = useState(false);
 
   // Environment variables
   const GHL_LOCATION_ID = import.meta.env.VITE_GHL_LOCATION_ID;
   const fallbackToken = import.meta.env.VITE_GHL_FILE_UPLOAD_TOKEN;
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Initialize token on mount
   useEffect(() => {
@@ -1029,7 +1044,9 @@ function Agreement() {
               {showPdfPreview ? "Hide Contract" : "View Contract"}
             </button>
           </div>
-          {showPdfPreview && (
+          
+          {/* Show PDF Preview on desktop, hide on mobile */}
+          {showPdfPreview && !isMobile && (
             <div className="pdf-preview-container mb-8">
               <PdfViewer
                 contactData={contactData}
@@ -1041,6 +1058,22 @@ function Agreement() {
               />
             </div>
           )}
+  
+          {/* Show mobile download button when PDF is ready on mobile */}
+          {showPdfPreview && isMobile && pdfReady && (
+            <div className="mobile-pdf-actions mb-8 text-center">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+            View Contract
+          </h2>
+              <button 
+                onClick={handleDownload}
+                className="btn btn-primary px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Print Preview
+              </button>
+            </div>
+          )}
+
           <div className="signature-section">
             <h3 className="text-xl text-center font-semibold mb-4">
               Add Your Signature

@@ -443,3 +443,36 @@
     min-height: 800px !important;
   }
 }
+
+
+/* Mobile PDF Actions */
+.mobile-pdf-actions {
+  display: none;
+}
+
+/* Hide PDF preview on mobile, show download button */
+@media (max-width: 768px) {
+  .pdf-preview-container {
+    display: none !important;
+  }
+  
+  .mobile-pdf-actions {
+    display: block;
+  }
+  
+  /* Ensure the view contract button works normally */
+  .btn-primary {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+  }
+}
