@@ -16,6 +16,21 @@ const PdfViewer = ({
   const [isLoading, setIsLoading] = useState(true);
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -331,56 +346,73 @@ const PdfViewer = ({
         </div>
       ) : pdfUrl ? (
         <>
-          {/* FIXED: Enhanced iOS scrolling container */}
-          <div 
-            ref={containerRef}
-            className="pdf-iframe-container ios-scroll-fix"
-            style={{ 
-              width: '100%', 
-              height: '70vh',
-              overflow: 'auto',
-              border: '1px solid #ccc',
-              borderRadius: '8px',
-              WebkitOverflowScrolling: 'touch',
-              overscrollBehavior: 'contain',
-              backgroundColor: '#f5f5f5',
-              position: 'relative'
-            }}
-          >
-            <iframe
-              ref={iframeRef}
-              title="PDF Viewer"
-              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
-              width="100%"
-              height="100%"
+          {/* Show PDF iframe only on desktop */}
+          {!isMobile && (
+            <div 
+              ref={containerRef}
+              className="pdf-iframe-container ios-scroll-fix"
               style={{ 
-                border: "none",
-                minHeight: '800px',
-                display: 'block',
-                overflow: 'auto'
+                width: '100%', 
+                height: '70vh',
+                overflow: 'auto',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                backgroundColor: '#f5f5f5',
+                position: 'relative'
               }}
-              loading="lazy"
-              allowFullScreen
-              // iOS specific attributes
-              scrolling="yes"
-              webkitallowfullscreen="true"
-              mozallowfullscreen="true"
-              allow="autoplay; fullscreen"
-            />
-          </div>
+            >
+              <iframe
+                ref={iframeRef}
+                title="PDF Viewer"
+                src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+                width="100%"
+                height="100%"
+                style={{ 
+                  border: "none",
+                  minHeight: '800px',
+                  display: 'block',
+                  overflow: 'auto'
+                }}
+                loading="lazy"
+                allowFullScreen
+                // iOS specific attributes
+                scrolling="yes"
+                webkitallowfullscreen="true"
+                mozallowfullscreen="true"
+                allow="autoplay; fullscreen"
+              />
+            </div>
+          )}
+          
+          {/* Show different buttons based on device */}
           <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4">
-            <button 
-              onClick={handlePrint} 
-              className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Print Preview
-            </button>
-            <button 
-              onClick={handleDownload} 
-              className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              Download Contract
-            </button>
+            {!isMobile ? (
+              // Desktop: Show both buttons
+              <>
+                <button 
+                  onClick={handlePrint} 
+                  className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Print Preview
+                </button>
+                <button 
+                  onClick={handleDownload} 
+                  className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                >
+                  Download Contract
+                </button>
+              </>
+            ) : (
+              // Mobile: Show only one button
+              <button 
+                onClick={handleDownload} 
+                className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              >
+                Print Preview
+              </button>
+            )}
           </div>
         </>
       ) : (

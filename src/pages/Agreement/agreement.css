@@ -1,4 +1,4 @@
-/* agreement.css - COMPLETE FIX WITH iOS PDF SCROLLING */
+/* agreement.css - UPDATED FOR MOBILE PDF HIDING */
 
 /* Reset and base styles */
 .agreement-wrapper {
@@ -279,8 +279,9 @@
     padding: 10px;
   }
   
-  .pdf-viewer-container iframe {
-    height: 500px;
+  /* Hide PDF iframe on mobile */
+  .pdf-iframe-container {
+    display: none !important;
   }
   
   .pdf-viewer-buttons {
@@ -292,16 +293,15 @@
     width: 100%;
     max-width: 280px;
   }
-  
-  /* Mobile PDF fixes */
-  .pdf-iframe-container {
+    /* Mobile PDF fixes */
+  /* .pdf-iframe-container {
     height: 60vh !important;
     margin: 0 -1rem;
     width: calc(100% + 2rem);
     border-radius: 0;
     border-left: none;
     border-right: none;
-  }
+  } */
 }
 
 /* iPhone SE */
@@ -309,14 +309,15 @@
   .agreement-main-container {
     padding: 5px;
   }
-  
-  .pdf-viewer-container iframe {
+
+
+  /* .pdf-viewer-container iframe {
     height: 400px;
   }
   
   .pdf-iframe-container {
     height: 50vh !important;
-  }
+  } */
   
   .details {
     padding: 15px;
@@ -339,14 +340,13 @@
   .agreement-main-container {
     padding: 8px;
   }
-  
-  .pdf-viewer-container iframe {
+  /* .pdf-viewer-container iframe {
     height: 450px;
   }
   
   .pdf-iframe-container {
     height: 55vh !important;
-  }
+  } */
 }
 
 /* iPad Mini */
@@ -441,38 +441,5 @@
     -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
     min-height: 800px !important;
-  }
-}
-
-
-/* Mobile PDF Actions */
-.mobile-pdf-actions {
-  display: none;
-}
-
-/* Hide PDF preview on mobile, show download button */
-@media (max-width: 768px) {
-  .pdf-preview-container {
-    display: none !important;
-  }
-  
-  .mobile-pdf-actions {
-    display: block;
-  }
-  
-  /* Ensure the view contract button works normally */
-  .btn-primary {
-    background-color: #2563eb;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-  }
-  
-  .btn-primary:hover {
-    background-color: #1d4ed8;
   }
 }

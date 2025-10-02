@@ -1046,7 +1046,7 @@ function Agreement() {
           </div>
           
           {/* Show PDF Preview on desktop, hide on mobile */}
-          {showPdfPreview && !isMobile && (
+          {showPdfPreview && (
             <div className="pdf-preview-container mb-8">
               <PdfViewer
                 contactData={contactData}
@@ -1059,20 +1059,7 @@ function Agreement() {
             </div>
           )}
   
-          {/* Show mobile download button when PDF is ready on mobile */}
-          {showPdfPreview && isMobile && pdfReady && (
-            <div className="mobile-pdf-actions mb-8 text-center">
-            <h2 className="text-2xl font-bold mb-6 text-center">
-            View Contract
-          </h2>
-              <button 
-                onClick={handleDownload}
-                className="btn btn-primary px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-              >
-                Print Preview
-              </button>
-            </div>
-          )}
+        
 
           <div className="signature-section">
             <h3 className="text-xl text-center font-semibold mb-4">
