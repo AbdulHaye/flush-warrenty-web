@@ -17,6 +17,7 @@ const PdfViewer = ({
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [pdfLoadError, setPdfLoadError] = useState(false);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -227,6 +228,7 @@ const PdfViewer = ({
     let url;
     const modifyPdf = async () => {
       setIsLoading(true);
+      setPdfLoadError(false);
       try {
         const response = await fetch("/Flush_warranty.pdf");
         const pdfBytes = await response.arrayBuffer();
@@ -306,6 +308,7 @@ const PdfViewer = ({
         if (onPdfModified) onPdfModified(modifiedPdfBytes);
       } catch (error) {
         console.error("Error modifying PDF:", error);
+        setPdfLoadError(true);
         setPdfUrl("/Flush_warranty.pdf");
       } finally {
         setIsLoading(false);
@@ -322,21 +325,14 @@ const PdfViewer = ({
     };
   }, [contactData, signatureData, selected, selectedDurations]);
 
-  // Enhanced iOS scrolling fix
-  useEffect(() => {
-    const handleTouchMove = (e) => {
-      // Allow natural scrolling on iOS
-    };
+  // Enhanced mobile PDF viewing
+  const handleIframeLoad = () => {
+    setPdfLoadError(false);
+  };
 
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('touchmove', handleTouchMove, { passive: true });
-      
-      return () => {
-        container.removeEventListener('touchmove', handleTouchMove);
-      };
-    }
-  }, []);
+  const handleIframeError = () => {
+    setPdfLoadError(true);
+  };
 
   return (
     <div className="pdf-viewer-container">
@@ -346,77 +342,98 @@ const PdfViewer = ({
         </div>
       ) : pdfUrl ? (
         <>
-          {/* Show PDF iframe only on desktop */}
-          {!isMobile && (
-            <div 
-              ref={containerRef}
-              className="pdf-iframe-container ios-scroll-fix"
+          {/* Mobile PDF Preview with enhanced styling */}
+          <div 
+            ref={containerRef}
+            className={`pdf-iframe-container ${isMobile ? 'mobile-pdf-view' : 'desktop-pdf-view'}`}
+            style={{ 
+              width: '100%', 
+              height: isMobile ? '60vh' : '70vh',
+              overflow: 'auto',
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+              backgroundColor: '#f5f5f5',
+              position: 'relative',
+              marginBottom: '20px'
+            }}
+          >
+            {pdfLoadError && (
+              <div className="pdf-error-message text-center p-4 text-red-600 bg-red-50 rounded">
+                Failed to load PDF. Please try downloading the contract instead.
+              </div>
+            )}
+            
+            <iframe
+              ref={iframeRef}
+              title="PDF Viewer"
+              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+              width="100%"
+              height="100%"
               style={{ 
-                width: '100%', 
-                height: '70vh',
-                overflow: 'auto',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehavior: 'contain',
-                backgroundColor: '#f5f5f5',
-                position: 'relative'
+                border: "none",
+                minHeight: isMobile ? '600px' : '800px',
+                display: pdfLoadError ? 'none' : 'block',
+                overflow: 'auto'
               }}
-            >
-              <iframe
-                ref={iframeRef}
-                title="PDF Viewer"
-                src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
-                width="100%"
-                height="100%"
-                style={{ 
-                  border: "none",
-                  minHeight: '800px',
-                  display: 'block',
-                  overflow: 'auto'
-                }}
-                loading="lazy"
-                allowFullScreen
-                // iOS specific attributes
-                scrolling="yes"
-                webkitallowfullscreen="true"
-                mozallowfullscreen="true"
-                allow="autoplay; fullscreen"
-              />
+              loading="lazy"
+              allowFullScreen
+              onLoad={handleIframeLoad}
+              onError={handleIframeError}
+              // Mobile-specific attributes for better compatibility
+              scrolling="yes"
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
+              allow="autoplay; fullscreen"
+            />
+          </div>
+          
+          {/* Instructions for mobile users */}
+          {isMobile && (
+            <div className="mobile-pdf-instructions bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+              <p className="font-semibold mb-1">📱 Mobile PDF Viewing Tips:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Pinch to zoom in/out for better readability</li>
+                <li>Swipe to navigate through pages</li>
+                <li>Use "Download Contract" to save a copy</li>
+                <li>Scroll down to review and sign after reading</li>
+              </ul>
             </div>
           )}
           
-          {/* Show different buttons based on device */}
-          <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4">
-            {!isMobile ? (
-              // Desktop: Show both buttons
-              <>
-                <button 
-                  onClick={handlePrint} 
-                  className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Print Preview
-                </button>
-                <button 
-                  onClick={handleDownload} 
-                  className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                >
-                  Download Contract
-                </button>
-              </>
-            ) : (
-              // Mobile: Show only one button
-              <button 
-                onClick={handleDownload} 
-                className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-              >
-                Print Preview
-              </button>
-            )}
+          {/* Action buttons */}
+          <div className="pdf-viewer-buttons flex justify-center gap-4 mt-4 flex-wrap">
+            <button 
+              onClick={handlePrint} 
+              className="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              Print Contract
+            </button>
+            <button 
+              onClick={handleDownload} 
+              className="btn btn-secondary px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            >
+              Download Contract
+            </button>
           </div>
         </>
       ) : (
-        <div className="text-center text-red-600 p-4">Error loading PDF. Please try again.</div>
+        <div className="text-center text-red-600 p-4 bg-red-50 rounded-lg">
+          {pdfLoadError ? (
+            <div>
+              <p>Error loading PDF preview.</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Retry Loading PDF
+              </button>
+            </div>
+          ) : (
+            "Error loading PDF. Please try again."
+          )}
+        </div>
       )}
     </div>
   );

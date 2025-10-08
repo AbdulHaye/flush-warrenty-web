@@ -443,3 +443,100 @@
     min-height: 800px !important;
   }
 }
+
+/* Enhanced Mobile PDF Styles */
+.mobile-pdf-view {
+  height: 60vh !important;
+  border: 2px solid #e5e7eb !important;
+  background: white !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.mobile-pdf-view iframe {
+  min-height: 600px !important;
+  background: white !important;
+}
+
+/* iOS Specific PDF Fixes */
+@supports (-webkit-touch-callout: none) {
+  .pdf-iframe-container {
+    -webkit-overflow-scrolling: touch !important;
+    overflow: auto !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    -webkit-overflow-scrolling: touch !important;
+    overflow: auto !important;
+  }
+}
+
+/* Android PDF Enhancements */
+@media (max-width: 768px) {
+  .pdf-iframe-container {
+    height: 60vh !important;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pdf-iframe-container iframe {
+    min-height: 600px !important;
+    border-radius: 6px;
+  }
+  
+  .mobile-pdf-instructions {
+    margin: 15px 0;
+    border-left: 4px solid #3b82f6;
+  }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+  .pdf-iframe-container {
+    height: 50vh !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    min-height: 500px !important;
+  }
+  
+  .pdf-viewer-buttons {
+    flex-direction: column;
+    gap: 10px !important;
+  }
+  
+  .pdf-viewer-buttons .btn {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Tablet Optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .pdf-iframe-container {
+    height: 65vh !important;
+  }
+  
+  .pdf-iframe-container iframe {
+    min-height: 700px !important;
+  }
+}
+
+/* PDF Error States */
+.pdf-error-message {
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+/* Ensure PDF is always visible and properly styled */
+.pdf-preview-container {
+  width: 100%;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Remove any previous hiding styles */
+.pdf-iframe-container {
+  display: block !important;
+}
