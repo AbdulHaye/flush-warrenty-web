@@ -142,26 +142,33 @@ function PaymentMethod() {
 
   const createNMIRecurringSubscription = async () => {
     try {
-      // Filter out plans with $0 value
+      // Filter out plans with $0 value (including tax)
       const nonZeroPlans = selectedPlans.filter((plan) => {
-        const monthlyAmount =
-          parseFloat(plan.price.match(/\d+\.\d+/)?.[0]) || 0;
-        return monthlyAmount > 0;
+        const monthlyAmount = parseFloat(plan.price.match(/\d+\.\d+/)?.[0]) || 0;
+        const taxAmount = plan.tax || 0;
+        const totalAmount = monthlyAmount + taxAmount;
+        return totalAmount > 0;
       });
+
       // If no plans with actual payment, just return success
       if (nonZeroPlans.length === 0) {
         return true;
       }
+
       // For each selected plan, create a recurring subscription
       for (const plan of nonZeroPlans) {
         const durationMonths = parseInt(plan.duration.match(/\d+/)[0]);
         const monthlyAmount = parseFloat(plan.price.match(/\d+\.\d+/)[0]);
+        const taxAmount = plan.tax || 0;
+        
+        // Calculate total amount including tax
+        const totalMonthlyAmount = monthlyAmount + taxAmount;
 
         const params = new URLSearchParams();
         params.append("security_key", NMI_SECURITY_KEY);
         params.append("recurring", "add_subscription");
         params.append("start_date", getNextMonthFirstDay());
-        params.append("plan_amount", monthlyAmount.toFixed(2));
+        params.append("plan_amount", totalMonthlyAmount.toFixed(2)); // Include tax in the amount
         params.append("plan_payments", durationMonths);
         params.append("month_frequency", "1");
         params.append("day_of_month", "1");
@@ -173,10 +180,10 @@ function PaymentMethod() {
           params.append("payment", "creditcard");
         } else {
           params.append("payment", "check");
-          params.append("checkaba", bankDetails.routingNumber); // Changed from check_routing
+          params.append("checkaba", bankDetails.routingNumber);
           params.append("check_account", bankDetails.accountNumber);
           params.append("check_name", bankDetails.name);
-          params.append("account_type", "checking"); // or 'savings'
+          params.append("account_type", "checking");
           params.append("check_type", "web");
         }
 
@@ -190,7 +197,7 @@ function PaymentMethod() {
         params.append("country", contactData.country || "US");
         params.append("email", contactData.email);
         params.append("phone", contactData.phone);
-        params.append("order_description", `${plan.title} - ${plan.duration}`);
+        params.append("order_description", `${plan.title} - ${plan.duration} (Includes tax: $${taxAmount.toFixed(2)})`);
 
         const response = await axios.post(
           `${import.meta.env.VITE_SERVER_BASE_URL}/api/nmi-subscription`,
@@ -245,7 +252,7 @@ function PaymentMethod() {
     }
 
     try {
-      // Create recurring subscriptions
+      // Create recurring subscriptions (now including tax)
       await createNMIRecurringSubscription();
 
       setSuccess(true);
@@ -281,11 +288,17 @@ function PaymentMethod() {
             <div className="order-summary">
               <h3>Order Summary</h3>
               <ul>
-                {selectedPlans.map((plan, index) => (
-                  <li key={index}>
-                    {plan.title} - {plan.price}
-                  </li>
-                ))}
+                {selectedPlans.map((plan, index) => {
+                  const monthlyAmount = parseFloat(plan.price.match(/\d+\.\d+/)?.[0]) || 0;
+                  const taxAmount = plan.tax || 0;
+                  const totalAmount = monthlyAmount + taxAmount;
+                  
+                  return (
+                    <li key={index}>
+                      {plan.title} - ${totalAmount.toFixed(2)}/month (Includes ${taxAmount.toFixed(2)} tax)
+                    </li>
+                  );
+                })}
               </ul>
               <p className="total">Total: ${totalPayment.toFixed(2)}/month</p>
             </div>
@@ -418,13 +431,20 @@ function PaymentMethod() {
             <div className="order-summary">
               <h3>Order Summary</h3>
               <ul>
-                {selectedPlans.map((plan, index) => (
-                  <li key={index}>
-                    {plan.title} - {plan.price}
-                  </li>
-                ))}
+                {selectedPlans.map((plan, index) => {
+                  const monthlyAmount = parseFloat(plan.price.match(/\d+\.\d+/)?.[0]) || 0;
+                  const taxAmount = plan.tax || 0;
+                  const totalAmount = monthlyAmount + taxAmount;
+                  
+                  return (
+                    <li key={index}>
+                      {plan.title} - ${totalAmount.toFixed(2)}/month (Includes ${taxAmount.toFixed(2)} tax)
+                    </li>
+                  );
+                })}
               </ul>
             </div>
+
             <p className="total-amount">
               Total: ${totalPayment.toFixed(2)}/month
             </p>
@@ -444,16 +464,7 @@ function PaymentMethod() {
               className="btn btn-primary margin-auto"
               disabled={loading}
             >
-              {loading ? (
-                <div
-                  className="fixed inset-0 flex items-center justify-center z-50"
-                  style={{ backgroundColor: "#1f78bc" }}
-                >
-                  <Loader />
-                </div>
-              ) : (
-                "Ready To Pay"
-              )}
+              {loading ? "Processing..." : "Ready To Pay"}
             </button>
           </form>
         </div>

@@ -29,6 +29,8 @@ const SUB_PACKAGE_IDS = [
   "PnJyfsKECatzdFkbXT4N", // Septic Tank Coverage
   "8PKKH94jrOHDhB3oq5lN", // Sewer Pipe Coverage
 ];
+const MAINTENANCE_PLAN_ID = "Wv9QwWG0VpcIUBsDk08J"; // Maintenance Plan ID
+const TAX_RATE = 0.0635;
 
 // Function to get a valid access token
 const getValidToken = async (tokenData, setTokenData) => {
@@ -91,6 +93,7 @@ function Agreement() {
   const [pdfReady, setPdfReady] = useState(false);
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
   const [minLoading, setMinLoading] = useState(true);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
@@ -105,12 +108,28 @@ function Agreement() {
     billingPhone: "",
     billingEmail: "",
   });
-
+  const [subtotal, setSubtotal] = useState(0);
+  const [tax, setTax] = useState(0);
   // Ref to store pending updates
   const pendingUpdatesRef = useRef({});
+  const [isMobile, setIsMobile] = useState(false);
 
   // Environment variables
   const GHL_LOCATION_ID = import.meta.env.VITE_GHL_LOCATION_ID;
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Initialize token on mount
   useEffect(() => {
@@ -187,10 +206,10 @@ function Agreement() {
         const fieldValue = getFieldFromData(card.id);
         const availableDurations = Object.keys(card.priceFieldIds);
 
+        // Filter out durations with $0 price
         const nonZeroDurations = availableDurations.filter((duration) => {
-          const priceFieldId = card.priceFieldIds[duration];
-          const priceField = contactCustomFields.find((f) => f.id === priceFieldId);
-          return priceField ? (parseFloat(priceField.value) || 0) > 0 : false;
+          const price = getPriceForPlan(card.id, duration);
+          return price > 0;
         });
 
         if (fieldValue && fieldValue.includes("Month")) {
@@ -208,6 +227,7 @@ function Agreement() {
       setError(err.message);
     } finally {
       setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -382,6 +402,9 @@ function Agreement() {
       .map((card) => {
         const duration = selectedDurations[card.id] || "36 Months";
         const price = extractPrice(card.id, duration);
+        const isTaxable = card.id !== MAINTENANCE_PLAN_ID;
+        const planTax = isTaxable ? price * TAX_RATE : 0;
+
         return {
           id: card.id,
           title: card.title,
@@ -389,6 +412,8 @@ function Agreement() {
             ? `$${price.toFixed(2)}/Month to Month`
             : `$${price.toFixed(2)}/Month for ${duration}`,
           monthlyCost: price,
+          tax: planTax,
+          isTaxable,
           duration,
         };
       });
@@ -397,6 +422,8 @@ function Agreement() {
       navigate("/payment-method", {
         state: {
           selectedPlans,
+          subtotal,
+          tax,
           totalPayment,
           contactData: editableFields,
           contactId: id,
@@ -499,34 +526,75 @@ function Agreement() {
     setSelectedDurations((prev) => ({ ...prev, [cardId]: duration }));
   };
 
+  // FIXED: Toggle function for dropdowns
+  const toggle = (cardIndex, sectionIndex) => {
+    setOpenItems(prev => ({
+      ...prev,
+      [cardIndex]: prev[cardIndex] === sectionIndex ? null : sectionIndex
+    }));
+  };
+
   const filteredProductCards = productCards.filter((card) => {
     const fieldValue = getCustomFieldValue(card.id);
     return fieldValue && fieldValue.includes("Month");
   });
 
+  // Replace the payment calculation useEffect with this:
   useEffect(() => {
     const mainPackageIndex = filteredProductCards.findIndex(
       (card) => card.id === MAIN_PACKAGE_ID
     );
     const isMainPackageSelected =
       mainPackageIndex !== -1 && selected[mainPackageIndex];
-    const total = filteredProductCards
-      .filter((card, index) => selected[index])
-      .reduce((sum, card) => {
-        if (isMainPackageSelected && SUB_PACKAGE_IDS.includes(card.id))
-          return sum;
+
+    let calculatedSubtotal = 0;
+    let calculatedTax = 0;
+
+    filteredProductCards.forEach((card, index) => {
+      if (selected[index]) {
+        if (isMainPackageSelected && SUB_PACKAGE_IDS.includes(card.id)) {
+          return;
+        }
+
         const duration = selectedDurations[card.id] || "36 Months";
-        return sum + extractPrice(card.id, duration);
-      }, 0);
+        const planPrice = extractPrice(card.id, duration);
+        calculatedSubtotal += planPrice;
+
+        // Add tax ONLY if it's NOT the Maintenance Plan
+        if (card.id !== MAINTENANCE_PLAN_ID) {
+          calculatedTax += planPrice * TAX_RATE;
+        }
+      }
+    });
+
+    const total = calculatedSubtotal + calculatedTax;
+    setSubtotal(calculatedSubtotal);
+    setTax(calculatedTax);
     setTotalPayment(total);
   }, [selected, selectedDurations, filteredProductCards, contactData]);
 
-  const toggle = (cardIndex, sectionIndex) => {
-    setOpenItems((prev) => ({
-      ...prev,
-      [cardIndex]: prev[cardIndex] === sectionIndex ? null : sectionIndex,
-    }));
-  };
+  useEffect(() => {
+    if (contactData) {
+      const newDurations = {};
+      filteredProductCards.forEach((card) => {
+        const nonZeroDurations = Object.keys(card.priceFieldIds).filter(
+          (duration) => {
+            const price = getPriceForPlan(card.id, duration);
+            return price > 0;
+          }
+        );
+
+        if (nonZeroDurations.length > 0 && !selectedDurations[card.id]) {
+          newDurations[card.id] = nonZeroDurations[0];
+        }
+      });
+
+      if (Object.keys(newDurations).length > 0) {
+        setSelectedDurations((prev) => ({ ...prev, ...newDurations }));
+      }
+      setDataLoading(false);
+    }
+  }, [contactData, filteredProductCards]);
 
   const toggleSelection = (index) => {
     const selectedCount = selected.filter((isSelected) => isSelected).length;
@@ -664,7 +732,7 @@ function Agreement() {
   return (
     <>
       <Navbar />
-      <div className="w-full max-w-screen-lg mx-auto my-15 p-4">
+      <div className="agreement-main-container w-full max-w-screen-lg mx-auto my-15 p-4">
         <div className="text-center mb-[50px]">
           <h3 className="text-[32px] font-bold leading-[44px] mb-[15px] text-black">
             Agreement Information
@@ -790,111 +858,123 @@ function Agreement() {
 
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            Verify Your Plan Details
+            Select Your Coverage
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 px-8 mx-auto justify-center">
-            {filteredProductCards.map((card, i) => {
-              const duration = selectedDurations[card.id] || "36 Months";
-              const price = extractPrice(card.id, duration);
-              
-              // Filter out durations with $0 price
-              const durationOptions = Object.keys(card.priceFieldIds).filter(dur => {
-                const price = getPriceForPlan(card.id, dur);
-                return price > 0;
-              });
+            {!dataLoading &&
+              filteredProductCards.map((card, i) => {
+                const durationOptions = Object.keys(card.priceFieldIds).filter(
+                  (dur) => {
+                    const price = getPriceForPlan(card.id, dur);
+                    return price > 0;
+                  }
+                );
 
-              const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+                const duration =
+                  selectedDurations[card.id] ||
+                  (durationOptions.length > 0
+                    ? durationOptions[0]
+                    : "36 Months");
+                const price = extractPrice(card.id, duration);
 
-              return (
-                <div
-                  key={i}
-                  className={`relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border ${
-                    selected[i] ? "border-blue-500" : "border-gray-300"
-                  } w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]`}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <img
-                      className="w-12 h-12"
-                      src={card.image}
-                      alt={card.title}
-                    />
-                    {isMajorPlanSelected && isSubPlan ? (
-                      <div className="text-right">
-                        <p className="text-sm text-green-600 font-medium">
-                          Included in Major Plan
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-right">
-                        <p className="text-xs text-gray-600">Starting From</p>
-                        <div>
-                          <h3 className="text-3xl font-bold text-gray-900">
-                            ${price.toFixed(2)}
-                          </h3>
-                          <div className="flex items-center justify-end mt-1">
-                            <label className="text-xs text-gray-600 mr-2">
-                              Plan type
-                            </label>
+                const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+                const isPopularPlan = card.id === MAIN_PACKAGE_ID;
 
-                            <select
-                              value={duration}
-                              onChange={(e) =>
-                                handleDurationChange(card.id, e.target.value)
-                              }
-                              className="text-xs text-gray-600 border rounded p-1"
-                            >
-                              {durationOptions.map((dur) => (
-                                <option key={dur} value={dur}>
-                                  {dur}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-blue-600 text-lg font-medium mb-2">
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-800 text-sm mb-1">
-                    {card.description}
-                  </p>
-                  <div className="flex-1">
-                    {card.sections.map((section, j) => (
-                      <div key={j} className="border-t border-gray-300 py-3">
-                        <div
-                          className="flex justify-between items-center cursor-pointer"
-                          onClick={() => toggle(i, j)}
-                        >
-                          <h4 className="text-lg font-semibold text-gray-900">
-                            {section.heading}
-                          </h4>
-                          <IoIosArrowDown
-                            className={`transform transition-transform duration-300 ${
-                              openItems[i] === j ? "rotate-180" : ""
-                            }`}
-                          />
-                        </div>
-                        {openItems[i] === j && (
-                          <div className="mt-2">
-                            {renderContent(section.content)}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => toggleSelection(i)}
-                    className={`w-full py-2 rounded-lg font-medium mt-auto ${
-                      selected[i] ? "proceed-button" : "select-button"
-                    }`}
+                return (
+                  <div
+                    key={i}
+                    className={`relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border ${
+                      selected[i] ? "border-blue-500" : "border-gray-300"
+                    } w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]`}
                   >
-                    {selected[i] ? "Selected" : "Select"}
-                  </button>
-                </div>
-              );
-            })}
+                    {/* Popular Badge */}
+                    {isPopularPlan && (
+                      <div className="popular-badge">Popular</div>
+                    )}
+                    
+                    <div className="flex justify-between items-center mb-4">
+                      <img
+                        className="w-12 h-12"
+                        src={card.image}
+                        alt={card.title}
+                      />
+                      {isMajorPlanSelected && isSubPlan ? (
+                        <div className="text-right">
+                          <p className="text-sm text-green-600 font-medium">
+                            Included in Major Plan
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-right">
+                          <p className="text-xs text-gray-600">Starting From</p>
+                          <div>
+                            <h3 className="text-3xl font-bold text-gray-900">
+                              ${price.toFixed(2)}
+                            </h3>
+                            <div className="flex items-center justify-end mt-1">
+                              <label className="text-xs text-gray-600 mr-2">
+                                Contract for
+                              </label>
+
+                              <select
+                                value={duration}
+                                onChange={(e) =>
+                                  handleDurationChange(card.id, e.target.value)
+                                }
+                                className="text-xs text-gray-600 border rounded p-1"
+                              >
+                                {durationOptions.map((dur) => (
+                                  <option key={dur} value={dur}>
+                                    {dur}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-blue-600 text-lg font-medium mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-gray-800 text-sm mb-1">
+                      {card.description}
+                    </p>
+                    <div className="flex-1">
+                      {card.sections.map((section, j) => (
+                        <div key={j} className="border-t border-gray-300 py-3">
+                          <div
+                            className="flex justify-between items-center cursor-pointer"
+                            onClick={() => toggle(i, j)}
+                          >
+                            <h4 className="text-lg font-semibold text-gray-900">
+                              {section.heading}
+                            </h4>
+                            <IoIosArrowDown
+                              className={`transform transition-transform duration-300 ${
+                                openItems[i] === j ? "rotate-180" : ""
+                              }`}
+                            />
+                          </div>
+                          {openItems[i] === j && (
+                            <div className="mt-2">
+                              {renderContent(section.content)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => toggleSelection(i)}
+                      className={`w-full py-2 rounded-lg font-medium mt-auto ${
+                        selected[i] ? "proceed-button" : "select-button"
+                      }`}
+                    >
+                      {selected[i] ? "Selected" : "Select"}
+                    </button>
+                  </div>
+                );
+              })}
           </div>
         </div>
 
@@ -910,6 +990,8 @@ function Agreement() {
               {showPdfPreview ? "Hide Contract" : "View Contract"}
             </button>
           </div>
+          
+          {/* Show PDF Preview on desktop, hide on mobile */}
           {showPdfPreview && (
             <div className="pdf-preview-container mb-8">
               <PdfViewer
@@ -922,6 +1004,9 @@ function Agreement() {
               />
             </div>
           )}
+  
+        
+
           <div className="signature-section">
             <h3 className="text-xl text-center font-semibold mb-4">
               Add Your Signature
@@ -948,11 +1033,23 @@ function Agreement() {
               </div>
             )}
             <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg">
-              <div className="text-xl font-semibold">
-                Total Payment:{" "}
-                <span className="text-blue-600">
-                  ${totalPayment.toFixed(2)}
-                </span>
+              <div className="text-lg font-semibold">
+                <div className="mb-2">
+                  Subtotal: <span className="text-blue-600">${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="mb-2">
+                  Tax (6.35%): <span className="text-blue-600">${tax.toFixed(2)}</span>
+                  {filteredProductCards.some((card, index) => 
+                    card.id === MAINTENANCE_PLAN_ID && selected[index]
+                  ) && (
+                    <span className="text-xs text-gray-600 ml-2">
+                      (Maintenance Plan tax excluded)
+                    </span>
+                  )}
+                </div>
+                <div className="text-xl">
+                  Total Payment: <span className="text-blue-600">${totalPayment.toFixed(2)}</span>
+                </div>
               </div>
               <button
                 onClick={handlePayout}

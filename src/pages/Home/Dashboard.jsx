@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import FlushWarrantyFooter from "../../components/Footer/flushWarrantyFooter";
 import { IoIosArrowDown } from "react-icons/io";
 import productCards from "../../pages/Agreement/product_cards";
 import "./Dashboard.css";
 import Loader from "../../components/Loader/Loader";
-import "../../components/Loader/loader.css"; // Import your loader CSS
+import "../../components/Loader/loader.css";
+
+// Define plan IDs
+const MAIN_PACKAGE_ID = "72V55XJap3h5hTBfw3qs";
+const SUB_PACKAGE_IDS = [
+  "HUe7oRoznbZ9lhH5olWw", // Leaching Field Coverage
+  "PnJyfsKECatzdFkbXT4N", // Septic Tank Coverage
+  "8PKKH94jrOHDhB3oq5lN", // Sewer Pipe Coverage
+];
 
 function Dashboard() {
   const [contactData, setContactData] = useState(null);
@@ -18,16 +26,11 @@ function Dashboard() {
   const [openItems, setOpenItems] = useState({});
   const contactId = localStorage.getItem("contactId");
   const [minLoading, setMinLoading] = useState(true);
-  const navigate = useNavigate(); // Initialize useNavigate
-  
+  const navigate = useNavigate();
 
-
-  
-  
-  // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("contactId"); // Clear contactId from localStorage
-    navigate("/my-account"); // Redirect to login page
+    localStorage.removeItem("contactId");
+    navigate("/my-account");
   };
 
   useEffect(() => {
@@ -56,9 +59,7 @@ function Dashboard() {
         const uuidKey = valueObj && Object.keys(valueObj)[0];
         const pdfData = uuidKey && valueObj[uuidKey];
         const pdfUrll = pdfData?.url;
-        setPdfUrl(pdfUrll || ""); // Set pdfUrl or empty string if undefined
-
-        console.log("PDF URL:", pdfUrll);
+        setPdfUrl(pdfUrll || "");
       } catch (err) {
         setError("Error fetching user data");
         console.error(err);
@@ -71,9 +72,8 @@ function Dashboard() {
 
     const timer = setTimeout(() => {
       setMinLoading(false);
-    }, 3000); // 2000ms = 2 seconds
+    }, 3000);
 
-    // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
   }, [contactId]);
 
@@ -83,10 +83,8 @@ function Dashboard() {
     return field ? field.value : null;
   };
 
-  const extractPrice = (cardId) => {
+  const extractPrice = (cardId, duration) => {
     if (!contactData?.customField) return 0;
-    const durationField = contactData.customField.find((f) => f.id === cardId);
-    const duration = durationField?.value || "36 Months";
     const card = productCards.find((c) => c.id === cardId);
     const priceFieldId = card?.priceFieldIds[duration];
     if (!priceFieldId) return 0;
@@ -153,6 +151,7 @@ function Dashboard() {
       alert("No PDF available to download.");
     }
   };
+
   if (loading || minLoading) {
     return (
       <div
@@ -168,10 +167,16 @@ function Dashboard() {
   if (!contactData)
     return <div className="text-center">No contact data available</div>;
 
+  // Filter product cards to only show those that have a custom field value with "Months"
   const filteredProductCards = productCards.filter((card) => {
     const fieldValue = getCustomFieldValue(card.id);
     return fieldValue && fieldValue.includes("Months");
   });
+
+  // Check if Major Plan is selected
+  const isMajorPlanSelected = filteredProductCards.some(
+    (card) => card.id === MAIN_PACKAGE_ID
+  );
 
   return (
     <>
@@ -179,7 +184,6 @@ function Dashboard() {
       <div className="w-full max-w-screen-lg mx-auto mt-[80px] px-[30px] xl:px-0">
         <div className="relative">
           <h3 className="dashboard-title">My Dashboard</h3>
-          {/* Logout Button - Positioned better */}
           <button onClick={handleLogout} className="dashboard-logout-btn">
             Logout
           </button>
@@ -190,27 +194,43 @@ function Dashboard() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12 px-8 mx-auto justify-center">
             {filteredProductCards.map((card, i) => {
               const duration = extractDuration(card.id);
-              const price = extractPrice(card.id);
+              const price = extractPrice(card.id, duration);
+              const isSubPlan = SUB_PACKAGE_IDS.includes(card.id);
+              const isPopularPlan = card.id === MAIN_PACKAGE_ID;
+
               return (
                 <div
                   key={i}
                   className="relative p-6 bg-[#f7fbff] rounded-2xl shadow-lg border border-blue-500 w-[300px] mx-auto hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col min-h-[400px]"
                 >
+                  {/* Popular Badge */}
+                  {isPopularPlan && (
+                    <div className="popular-badge">Popular</div>
+                  )}
+                  
                   <div className="flex justify-between items-center mb-4">
                     <img
                       className="w-12 h-12"
                       src={card.image}
                       alt={card.title}
                     />
-                    <div className="text-right">
-                      <p className="text-xs text-gray-600">Starting From</p>
-                      <h3 className="text-3xl font-bold text-gray-900">
-                        ${price.toFixed(2)}
-                      </h3>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Contract for {duration}
-                      </p>
-                    </div>
+                    {isMajorPlanSelected && isSubPlan ? (
+                      <div className="text-right">
+                        <p className="text-sm text-green-600 font-medium">
+                          Included in Major Plan
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-right">
+                        <p className="text-xs text-gray-600">Starting From</p>
+                        <h3 className="text-3xl font-bold text-gray-900">
+                          ${price.toFixed(2)}
+                        </h3>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Contract for {duration}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <h3 className="text-blue-600 text-lg font-medium mb-2">
                     {card.title}
@@ -242,7 +262,7 @@ function Dashboard() {
                       </div>
                     ))}
                   </div>
-                  <div className="w-full py-2 rounded-lg bg-blue-600 text-white font-medium text-center mt-auto">
+                  <div className="w-full py-2 rounded-lg text-white font-medium text-center mt-auto selectedbutton">
                     Selected
                   </div>
                 </div>
