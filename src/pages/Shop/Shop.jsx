@@ -84,7 +84,9 @@ function Shop() {
   const getDurations = (pricingOptions) => {
     return pricingOptions.map((option) => {
       const match = option.match(/for (\d+ Months)/);
-      return match ? match[1] : "Unknown";
+      if (match) return match[1];
+      if (option.includes("Month to Month")) return "Month to Month";
+      return "Unknown";
     });
   };
 
@@ -189,9 +191,10 @@ function Shop() {
       }
       const duration =
         selectedDurations[productCards.findIndex((c) => c.id === card.id)];
-      return `$${getPriceForDuration(card, duration).toFixed(
-        2
-      )}/Month for ${duration}`;
+      const price = getPriceForDuration(card, duration).toFixed(2);
+      return duration === "Month to Month"
+        ? `$${price}/Month to Month`
+        : `$${price}/Month for ${duration}`;
     });
 
     navigate("/billing", {
@@ -304,7 +307,7 @@ function Shop() {
                         </h3>
                         <div className="flex items-center justify-end mt-1">
                           <label className="text-xs text-gray-600 mr-2">
-                            Contract for
+                            Plan type
                           </label>
                           <select
                             value={selectedDurations[i]}

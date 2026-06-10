@@ -16,7 +16,7 @@ const productCards = [
     selectedOption: "$12.00/Month for 36 Months",
     pricingOptions: [
       "$12.00/Month for 36 Months",
-      "$17.00/Month for 24 Months",
+      "$17.00/Month to Month",
     ],
     description:
       "Provides regular septic maintenance and essential services to prevent costly emergencies, with priority service for faster response times.",
@@ -68,8 +68,7 @@ const productCards = [
     selectedOption: "$19.99/Month for 36 Months",
     pricingOptions: [
       "$19.99/Month for 36 Months",
-      "$24.99/Month for 72 Months",
-      "$34.99/Month for 108 Months",
+      "$34.99/Month to Month",
     ],
     description:
       "Comprehensive protection for your septic system, covering all major components at an affordable monthly rate.",
@@ -115,8 +114,7 @@ const productCards = [
     selectedOption: "$14.99/Month for 36 Months",
     pricingOptions: [
       "$14.99/Month for 36 Months",
-      "$19.99/Month for 72 Months",
-      "$29.99/Month for 108 Months",
+      "$29.99/Month to Month",
     ],
     description:
       "Protects against failures in the leaching field and related issues.",
@@ -162,8 +160,7 @@ const productCards = [
     selectedOption: "$4.99/Month for 36 Months",
     pricingOptions: [
       "$4.99/Month for 36 Months",
-      "$7.99/Month for 72 Months",
-      "$10.99/Month for 108 Months",
+      "$10.99/Month to Month",
     ],
     description:
       "Protects against mechanical failures and malfunctions in your ejector pump system.",
@@ -211,8 +208,7 @@ const productCards = [
     selectedOption: "$24.00/Month for 36 Months",
     pricingOptions: [
       "$24.00/Month for 36 Months",
-      "$22.00/Month for 72 Months",
-      "$18.00/Month for 108 Months",
+      "$24.00/Month to Month",
     ],
     description:
       "Protects against tank structural failures, broken baffles, and other major issues.",
@@ -256,8 +252,7 @@ const productCards = [
     selectedOption: "$7.99/Month for 36 Months",
     pricingOptions: [
       "$7.99/Month for 36 Months",
-      "$9.99/Month for 72 Months",
-      "$14.99/Month for 108 Months",
+      "$14.99/Month to Month",
     ],
     description:
       "Protects against cracks, aging pipes, and tree root damage.",

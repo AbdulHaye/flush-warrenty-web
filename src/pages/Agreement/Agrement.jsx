@@ -13,6 +13,11 @@ import productCards from "./product_cards";
 import Loader from "../../components/Loader/Loader";
 import "../../components/Loader/loader.css";
 import debounce from "lodash.debounce";
+import {
+  fetchTokenFromGHL,
+  updateTokenInGHL,
+  refreshToken,
+} from "../../components/token/tokenUtils";
 
 // Configure PDF worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -25,67 +30,10 @@ const SUB_PACKAGE_IDS = [
   "8PKKH94jrOHDhB3oq5lN", // Sewer Pipe Coverage
 ];
 
-// Function to fetch token from GHL Custom Values
-const fetchTokenFromGHL = async () => {
-  try {
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_SERVER_BASE_URL
-      }/api/custom-values/ZKXV4IYMT4uPQkQ0GV3G`
-    );
-    let tokenData = JSON.parse(response.data.value);
-    if (!tokenData.expiresAt && tokenData.expires_in) {
-      tokenData.expiresAt = Date.now() + tokenData.expires_in * 1000;
-    }
-    return tokenData;
-  } catch (error) {
-    console.error("Failed to fetch token from GHL:", error);
-    throw error;
-  }
-};
-
-// Function to update token in GHL Custom Values
-const updateTokenInGHL = async (newTokenData) => {
-  try {
-    await axios.put(
-      `${
-        import.meta.env.VITE_API_BASE_URL
-      }/api/custom-values/ZKXV4IYMT4uPQkQ0GV3G`,
-      {
-        value: JSON.stringify(newTokenData),
-      }
-    );
-  } catch (error) {
-    console.error("Failed to update token in GHL:", error);
-    throw error;
-  }
-};
-
-// Function to refresh token
-const refreshToken = async (refreshToken) => {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/api/refresh-token`,
-      { refresh_token: refreshToken },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const newTokens = response.data;
-    newTokens.expiresAt = Date.now() + newTokens.expires_in * 1000;
-    return newTokens;
-  } catch (error) {
-    console.error("Failed to refresh token:", error);
-    throw error;
-  }
-};
-
 // Function to get a valid access token
-const getValidToken = async (tokenData, setTokenData, fallbackToken) => {
+const getValidToken = async (tokenData, setTokenData) => {
   if (!tokenData) {
-    tokenData = await fetchTokenFromGHL(fallbackToken);
+    tokenData = await fetchTokenFromGHL();
     setTokenData(tokenData);
   }
   return tokenData.access_token;
@@ -163,13 +111,12 @@ function Agreement() {
 
   // Environment variables
   const GHL_LOCATION_ID = import.meta.env.VITE_GHL_LOCATION_ID;
-  const fallbackToken = import.meta.env.VITE_GHL_FILE_UPLOAD_TOKEN;
 
   // Initialize token on mount
   useEffect(() => {
     const initializeToken = async () => {
       try {
-        const initialToken = await fetchTokenFromGHL(fallbackToken);
+        const initialToken = await fetchTokenFromGHL();
         setTokenData(initialToken);
       } catch (error) {
         console.error("Failed to initialize token:", error);
@@ -187,11 +134,7 @@ function Agreement() {
       return;
     }
     try {
-      const accessToken = await getValidToken(
-        tokenData,
-        setTokenData,
-        fallbackToken
-      );
+      const accessToken = await getValidToken(tokenData, setTokenData);
       const response = await axios.get(
         `https://rest.gohighlevel.com/v1/contacts/${id}`,
         {
@@ -225,26 +168,32 @@ function Agreement() {
           "",
       });
 
-      // Filter product cards and initialize selected states
+      // Filter product cards using contact data directly (avoids stale state)
+      const contactCustomFields = contact.customField || [];
+      const getFieldFromData = (fieldId) => {
+        const field = contactCustomFields.find((f) => f.id === fieldId);
+        return field ? field.value : null;
+      };
+
       const filteredCards = productCards.filter((card) => {
-        const fieldValue = getCustomFieldValue(card.id);
-        return fieldValue && fieldValue.includes("Months");
+        const fieldValue = getFieldFromData(card.id);
+        return fieldValue && fieldValue.includes("Month");
       });
       setSelected(Array(filteredCards.length).fill(true));
 
-      // Initialize durations - only show options with non-zero prices
+      // Initialize durations from the contact's plan duration field
       const initialDurations = {};
       filteredCards.forEach((card) => {
-        const fieldValue = getCustomFieldValue(card.id);
+        const fieldValue = getFieldFromData(card.id);
         const availableDurations = Object.keys(card.priceFieldIds);
-        
-        // Filter out durations with $0 price
-        const nonZeroDurations = availableDurations.filter(duration => {
-          const price = getPriceForPlan(card.id, duration);
-          return price > 0;
+
+        const nonZeroDurations = availableDurations.filter((duration) => {
+          const priceFieldId = card.priceFieldIds[duration];
+          const priceField = contactCustomFields.find((f) => f.id === priceFieldId);
+          return priceField ? (parseFloat(priceField.value) || 0) > 0 : false;
         });
 
-        if (fieldValue && fieldValue.includes("Months")) {
+        if (fieldValue && fieldValue.includes("Month")) {
           if (nonZeroDurations.includes(fieldValue)) {
             initialDurations[card.id] = fieldValue;
           } else if (nonZeroDurations.length > 0) {
@@ -309,11 +258,7 @@ function Agreement() {
     }
 
     try {
-      const accessToken = await getValidToken(
-        tokenData,
-        setTokenData,
-        fallbackToken
-      );
+      const accessToken = await getValidToken(tokenData, setTokenData);
       await axios.put(
         `https://rest.gohighlevel.com/v1/contacts/${id}`,
         payload,
@@ -365,7 +310,6 @@ function Agreement() {
     id,
     tokenData,
     setTokenData,
-    fallbackToken,
   ]);
 
   // Upload signature and PDF with token refresh
@@ -441,7 +385,9 @@ function Agreement() {
         return {
           id: card.id,
           title: card.title,
-          price: `$${price.toFixed(2)}/Month for ${duration}`,
+          price: duration === "Month to Month"
+            ? `$${price.toFixed(2)}/Month to Month`
+            : `$${price.toFixed(2)}/Month for ${duration}`,
           monthlyCost: price,
           duration,
         };
@@ -555,7 +501,7 @@ function Agreement() {
 
   const filteredProductCards = productCards.filter((card) => {
     const fieldValue = getCustomFieldValue(card.id);
-    return fieldValue && fieldValue.includes("Months");
+    return fieldValue && fieldValue.includes("Month");
   });
 
   useEffect(() => {
@@ -887,7 +833,7 @@ function Agreement() {
                           </h3>
                           <div className="flex items-center justify-end mt-1">
                             <label className="text-xs text-gray-600 mr-2">
-                              Contract for
+                              Plan type
                             </label>
 
                             <select

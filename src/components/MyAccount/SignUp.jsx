@@ -66,7 +66,13 @@ function SignUp() {
 
       navigate("/my-account");
     } catch (err) {
-      setError("Error signing up. Please try again.");
+      if (err.response?.status === 429) {
+        setError("Too many requests. Please wait a moment and try again.");
+      } else if (err.response?.status === 401) {
+        setError("API authentication error. Please contact support.");
+      } else {
+        setError("Error signing up. Please try again.");
+      }
       console.error(err);
     }
   };

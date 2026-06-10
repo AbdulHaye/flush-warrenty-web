@@ -11,7 +11,7 @@ const productCards = [
         id: "Wv9QwWG0VpcIUBsDk08J",
         priceFieldIds: {
             "36 Months": "JPtIRw5ixqaTizgcQKzF",
-            "24 Months": "Bljw8PhiId2BuVcOqNw4"
+            "Month to Month": "hMyqPxq6LywwnJXBr5c3"
         },
         image: iconFour,
         // title: "Routine Pumping",
@@ -68,8 +68,7 @@ const productCards = [
         id: "72V55XJap3h5hTBfw3qs",
         priceFieldIds: {
             "36 Months": "ngCrtvaJn6V7sVC1kiUJ",
-            "72 Months": "7pMEQWqlqMZFsuklciTu",
-            "108 Months": "XUdLb8JnnjLE7LcRnus4"
+            "Month to Month": "kQxSr4WjMXBDnb94Tj09"
         },
         image: iconTwo,
         title: "Septic Major Component Plan",
@@ -120,8 +119,7 @@ const productCards = [
         id: "HUe7oRoznbZ9lhH5olWw",
         priceFieldIds: {
             "36 Months": "23Lqqqu1H8qfeEMEb8uc",
-            "72 Months": "K2aWPWOpZHLSFtxp5V6x",
-            "108 Months": "HaVn2obea2QfCxP9I1l6"
+            "Month to Month": "U56DMSPqmnkTeXRBA681"
         },
         image: iconOne,
         title: "Leaching Field Coverage",
@@ -172,8 +170,7 @@ const productCards = [
         id: "pB5QCDKDTNbtl9H38vMz",
         priceFieldIds: {
             "36 Months": "b70PxDFFnz0UsZGxqpcc",
-            "72 Months": "jNCBTdGgtLjnxftX413x",
-            "108 Months": "r6hRoWfHfhAhe6gG60nx"
+            "Month to Month": "eHtlMbyCepPOpVjKlWf9"
         },
         image: iconThree,
         title: "Ejector Pump Coverage",
@@ -226,8 +223,7 @@ const productCards = [
         id: "PnJyfsKECatzdFkbXT4N",
         priceFieldIds: {
             "36 Months": "O8j4MfuwYh729rbxoeXf",
-            "72 Months": "V0h9bhj1u5PJK9z61tnI",
-            "108 Months": "Y0OfpFfXZruHzrBJ9KnJ"
+            "Month to Month": "4ldBcFukbsw03B3Xnwyu"
         },
         image: iconFive,
         title: "Septic Tank Coverage",
@@ -276,8 +272,7 @@ const productCards = [
         id: "8PKKH94jrOHDhB3oq5lN",
         priceFieldIds: {
             "36 Months": "9ZNrtPDOW8O2z1ajolyT",
-            "72 Months": "I3NZAr0wGr4ImVtCX2ak",
-            "108 Months": "19SMHjRlsCMqyl8STKlF"
+            "Month to Month": "OHaxRoEdCKWG7QNQbJNt"
         },
         image: iconSix,
         title: "Sewer Pipe Coverage",
