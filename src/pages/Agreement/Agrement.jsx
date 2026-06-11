@@ -206,10 +206,13 @@ function Agreement() {
         const fieldValue = getFieldFromData(card.id);
         const availableDurations = Object.keys(card.priceFieldIds);
 
-        // Filter out durations with $0 price
+        // Filter out durations with $0 price — use the freshly fetched contact
+        // data directly (not getPriceForPlan which reads stale React state)
         const nonZeroDurations = availableDurations.filter((duration) => {
-          const price = getPriceForPlan(card.id, duration);
-          return price > 0;
+          const priceFieldId = card.priceFieldIds[duration];
+          if (!priceFieldId) return false;
+          const priceField = contact.customField?.find((f) => f.id === priceFieldId);
+          return priceField ? (parseFloat(priceField.value) || 0) > 0 : false;
         });
 
         if (fieldValue && fieldValue.includes("Month")) {
