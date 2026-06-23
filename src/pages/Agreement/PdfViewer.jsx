@@ -216,6 +216,41 @@ const PdfViewer = ({
           }
         };
 
+        // Determine contract type:
+        // Sewer Pipe OR Septic Tank selected → Month-to-Month; otherwise → 36 Months
+        // Maintenance Plan does NOT affect this logic.
+        const SEWER_PIPE_ID = "8PKKH94jrOHDhB3oq5lN";
+        const SEPTIC_TANK_ID = "PnJyfsKECatzdFkbXT4N";
+        const isSewerPipeMonthToMonth = filteredProductCards.some(
+          (card, index) =>
+            card.id === SEWER_PIPE_ID &&
+            selected[index] &&
+            (selectedDurations[card.id] || "36 Months") === "Month to Month"
+        );
+        const isSepticTankMonthToMonth = filteredProductCards.some(
+          (card, index) =>
+            card.id === SEPTIC_TANK_ID &&
+            selected[index] &&
+            (selectedDurations[card.id] || "36 Months") === "Month to Month"
+        );
+        const isMonthToMonth = isSewerPipeMonthToMonth || isSepticTankMonthToMonth;
+
+        const thirtysSixMonthText =
+          "The Coverage is for thirty-six (36) months from the Effective Date. At the end of the 36-month\n" +
+          "term, FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage\n" +
+          "will not continue beyond the 36-month term unless You accept and sign the new Agreement provided\n" +
+          "by FLUSH.\n" +
+          "• Upon acceptance, any new rates and terms will apply during the renewal term and thereafter,\n" +
+          "alongside these terms and conditions.";
+
+        const monthToMonthText =
+          "The Coverage is for months to months from the Effective Date. At the end of the month term,\n" +
+          "FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage\n" +
+          "will not continue beyond the month term unless You accept and sign the new Agreement provided\n" +
+          "by FLUSH.\n" +
+          "• Upon acceptance, any new rates and terms will apply during the renewal term and thereafter,\n" +
+          "alongside these terms and conditions.";
+
         // Set all fields
         setTextField("name", fullName);
         setTextField("address", address);
@@ -229,6 +264,7 @@ const PdfViewer = ({
         setTextField("full_name", billingName);
         setTextField("full_address", billingAddress);
         setTextField("client_full_name", fullName);
+        setTextField("price_adjustments_and_renewals", isMonthToMonth ? monthToMonthText : thirtysSixMonthText);
 
         // Add signature if available
         if (signatureData) {
