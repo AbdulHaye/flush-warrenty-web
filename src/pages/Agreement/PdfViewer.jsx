@@ -204,11 +204,13 @@ const PdfViewer = ({
         form.updateFieldAppearances(helveticaFont);
 
         // Simple field setting function
-        const setTextField = (name, value) => {
+        const setTextField = (name, value, fontSize) => {
           try {
             const field = form.getTextField(name);
             if (field) {
               field.setText(value || "");
+              // Pin an explicit size so pdf-lib doesn't auto-shrink long text.
+              if (fontSize) field.setFontSize(fontSize);
               field.enableReadOnly();
             }
           } catch (error) {
@@ -216,40 +218,23 @@ const PdfViewer = ({
           }
         };
 
-        // Determine contract type:
-        // Sewer Pipe OR Septic Tank selected → Month-to-Month; otherwise → 36 Months
-        // Maintenance Plan does NOT affect this logic.
-        const SEWER_PIPE_ID = "8PKKH94jrOHDhB3oq5lN";
-        const SEPTIC_TANK_ID = "PnJyfsKECatzdFkbXT4N";
-        const isSewerPipeMonthToMonth = filteredProductCards.some(
-          (card, index) =>
-            card.id === SEWER_PIPE_ID &&
-            selected[index] &&
-            (selectedDurations[card.id] || "36 Months") === "Month to Month"
-        );
-        const isSepticTankMonthToMonth = filteredProductCards.some(
-          (card, index) =>
-            card.id === SEPTIC_TANK_ID &&
-            selected[index] &&
-            (selectedDurations[card.id] || "36 Months") === "Month to Month"
-        );
-        const isMonthToMonth = isSewerPipeMonthToMonth || isSepticTankMonthToMonth;
+        // Build the price adjustments / renewals text as a single paragraph
+        // listing each selected coverage with its tenure (name and duration).
+        const selectedCoveragesTenureList = filteredProductCards
+          .filter((card, index) => selected[index])
+          .map((card) => {
+            const displayName =
+              card.id === "72V55XJap3h5hTBfw3qs"
+                ? "Septic Major Component Plan"
+                : card.title;
+            const duration = selectedDurations[card.id] || "36 Months";
+            return `${displayName} (${duration})`;
+          })
+          .join(", ");
 
-        const thirtysSixMonthText =
-          "The Coverage is for thirty-six (36) months from the Effective Date. At the end of the 36-month\n" +
-          "term, FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage\n" +
-          "will not continue beyond the 36-month term unless You accept and sign the new Agreement provided\n" +
-          "by FLUSH.\n" +
-          "• Upon acceptance, any new rates and terms will apply during the renewal term and thereafter,\n" +
-          "alongside these terms and conditions.";
-
-        const monthToMonthText =
-          "The Coverage is for months to months from the Effective Date. At the end of the month term,\n" +
-          "FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage\n" +
-          "will not continue beyond the month term unless You accept and sign the new Agreement provided\n" +
-          "by FLUSH.\n" +
-          "• Upon acceptance, any new rates and terms will apply during the renewal term and thereafter,\n" +
-          "alongside these terms and conditions.";
+        const priceAdjustmentsAndRenewalsText = selectedCoveragesTenureList
+          ? `The Coverage is for ${selectedCoveragesTenureList} from the Effective Date. At the end of each term, FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage will not continue beyond its term unless You accept and sign the new Agreement provided by FLUSH. Upon acceptance, any new rates and terms will apply during the renewal term and thereafter, alongside these terms and conditions.`
+          : "No coverages selected.";
 
         // Set all fields
         setTextField("name", fullName);
@@ -264,7 +249,7 @@ const PdfViewer = ({
         setTextField("full_name", billingName);
         setTextField("full_address", billingAddress);
         setTextField("client_full_name", fullName);
-        setTextField("price_adjustments_and_renewals", isMonthToMonth ? monthToMonthText : thirtysSixMonthText);
+        setTextField("price_adjustments_and_renewals", priceAdjustmentsAndRenewalsText, 10);
 
         // Add signature if available
         if (signatureData) {
