@@ -4,6 +4,16 @@ import productCards from "./product_cards";
 import Loader from "../../components/Loader/Loader";
 import "../../components/Loader/loader.css";
 
+const MAJOR_PLAN_ID = "72V55XJap3h5hTBfw3qs";
+// These plans are bundled under the Septic Major Component Plan, so they must
+// follow the major plan's tenure whenever it is selected.
+const MAJOR_PLAN_CHILD_IDS = [
+  "HUe7oRoznbZ9lhH5olWw", // Ejector Pump Coverage
+  "PnJyfsKECatzdFkbXT4N", // Leaching Field Coverage
+  "8PKKH94jrOHDhB3oq5lN", // Septic Tank Coverage
+];
+const DEFAULT_DURATION = "36 Months";
+
 const PdfViewer = ({
   contactData,
   signatureData,
@@ -61,29 +71,37 @@ const PdfViewer = ({
     return priceField ? parseFloat(priceField.value) : 0;
   };
 
+  const isMajorPlanSelected = filteredProductCards.some(
+    (card, index) => card.id === MAJOR_PLAN_ID && selected[index]
+  );
+
+  // Child coverages inherit the Septic Major Component Plan's tenure when that
+  // plan is selected; otherwise they keep their own selected tenure.
+  const getEffectiveDuration = (cardId) => {
+    if (isMajorPlanSelected && MAJOR_PLAN_CHILD_IDS.includes(cardId)) {
+      return selectedDurations[MAJOR_PLAN_ID] || DEFAULT_DURATION;
+    }
+    return selectedDurations[cardId] || DEFAULT_DURATION;
+  };
+
   const getSelectedCoverages = () => {
     let coveragesText = "";
     let totalMonthlyCost = 0;
 
-    const mainPackageIndex = filteredProductCards.findIndex(
-      (card) => card.id === "72V55XJap3h5hTBfw3qs"
-    );
-    const isMainPackageSelected = mainPackageIndex !== -1 && selected[mainPackageIndex];
+    const isMainPackageSelected = isMajorPlanSelected;
 
     filteredProductCards.forEach((card, index) => {
       const isSelected = selected[index];
-      const duration = selectedDurations[card.id] || "36 Months";
+      const duration = getEffectiveDuration(card.id);
       let price = 0;
 
       if (isSelected) {
         price = getPriceForPlan(card.id, duration);
 
-        if (card.id === "72V55XJap3h5hTBfw3qs") {
+        if (card.id === MAJOR_PLAN_ID) {
           coveragesText += `Septic Major Component Plan: $${price.toFixed(2)}/month for ${duration}\n`;
           totalMonthlyCost += price;
-        } else if (
-          ["HUe7oRoznbZ9lhH5olWw", "PnJyfsKECatzdFkbXT4N", "8PKKH94jrOHDhB3oq5lN"].includes(card.id)
-        ) {
+        } else if (MAJOR_PLAN_CHILD_IDS.includes(card.id)) {
           if (isMainPackageSelected) {
             coveragesText += `${card.title}: Included in Major Plan\n`;
           } else {
@@ -108,7 +126,7 @@ const PdfViewer = ({
     let componentsText = "";
     filteredProductCards.forEach((card, index) => {
       if (selected[index]) {
-        const displayName = card.id === "72V55XJap3h5hTBfw3qs" ? "Septic Major Component Plan" : card.title;
+        const displayName = card.id === MAJOR_PLAN_ID ? "Septic Major Component Plan" : card.title;
         componentsText += `${displayName}\n`;
       }
     });
@@ -150,7 +168,7 @@ const PdfViewer = ({
     filteredProductCards.forEach((card, index) => {
       if (selected[index]) {
         const deductibleInfo = card.sections[2]?.content[0] || "No deductible information";
-        const displayName = card.id === "72V55XJap3h5hTBfw3qs" ? "Septic Major Component Plan" : card.title;
+        const displayName = card.id === MAJOR_PLAN_ID ? "Septic Major Component Plan" : card.title;
         serviceFeesText += `${displayName}: ${deductibleInfo}\n`;
       }
     });
@@ -199,12 +217,43 @@ const PdfViewer = ({
 
         console.log("Filling PDF form fields...");
 
-        // Embed font and update form
+        // Embed fonts and update form. Times matches the serif body text of the
+        // agreement template, so paragraph-style fields blend in with it.
         const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const timesFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
         form.updateFieldAppearances(helveticaFont);
 
+        // Largest size (down to `min`) at which `text` wraps inside the field's
+        // box without spilling past the bottom, so long paragraphs are not clipped.
+        const fitFontSize = (field, text, font, max = 11, min = 5) => {
+          const widget = field.acroField.getWidgets()[0];
+          if (!widget) return min;
+          const { width, height } = widget.getRectangle();
+          const availableWidth = Math.max(width - 6, 1);
+          const availableHeight = Math.max(height - 6, 1);
+          const words = String(text).split(/\s+/).filter(Boolean);
+
+          for (let size = max; size >= min; size -= 0.5) {
+            let lines = 1;
+            let current = "";
+            for (const word of words) {
+              const candidate = current ? `${current} ${word}` : word;
+              if (font.widthOfTextAtSize(candidate, size) <= availableWidth) {
+                current = candidate;
+              } else {
+                lines += 1;
+                current = word;
+              }
+            }
+            // pdf-lib lays multiline fields out at 1.2x the glyph height.
+            const lineHeight = font.heightAtSize(size) * 1.2;
+            if (lines * lineHeight <= availableHeight) return size;
+          }
+          return min;
+        };
+
         // Simple field setting function
-        const setTextField = (name, value, fontSize) => {
+        const setTextField = (name, value, fontSize, font) => {
           try {
             const field = form.getTextField(name);
             if (field) {
@@ -212,9 +261,23 @@ const PdfViewer = ({
               // Pin an explicit size so pdf-lib doesn't auto-shrink long text.
               if (fontSize) field.setFontSize(fontSize);
               field.enableReadOnly();
+              // Re-render with the requested font, overriding the form default.
+              if (font) field.updateAppearances(font);
             }
           } catch (error) {
             console.warn(`Field ${name} not found, skipping...`);
+          }
+        };
+
+        // Shrink-to-fit variant for long paragraphs in a fixed-height box.
+        const setFittedTextField = (name, value, font, max, min) => {
+          try {
+            const field = form.getTextField(name);
+            if (!field) return;
+            field.enableMultiline();
+            setTextField(name, value, fitFontSize(field, value, font, max, min), font);
+          } catch (error) {
+            console.warn(`Field ${name} could not be fitted, skipping...`, error);
           }
         };
 
@@ -224,10 +287,10 @@ const PdfViewer = ({
           .filter((card, index) => selected[index])
           .map((card) => {
             const displayName =
-              card.id === "72V55XJap3h5hTBfw3qs"
+              card.id === MAJOR_PLAN_ID
                 ? "Septic Major Component Plan"
                 : card.title;
-            const duration = selectedDurations[card.id] || "36 Months";
+            const duration = getEffectiveDuration(card.id);
             return `${displayName} (${duration})`;
           })
           .join(", ");
@@ -249,7 +312,11 @@ const PdfViewer = ({
         setTextField("full_name", billingName);
         setTextField("full_address", billingAddress);
         setTextField("client_full_name", fullName);
-        setTextField("price_adjustments_and_renewals", priceAdjustmentsAndRenewalsText, 10);
+        setFittedTextField(
+          "price_adjustments_and_renewals",
+          priceAdjustmentsAndRenewalsText,
+          timesFont
+        );
 
         // Add signature if available
         if (signatureData) {
