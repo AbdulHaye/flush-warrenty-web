@@ -165,14 +165,30 @@ const PdfViewer = ({
 
   const getServiceFeesDeductibles = () => {
     let serviceFeesText = "";
+    let totalDeductible = 0;
     filteredProductCards.forEach((card, index) => {
       if (selected[index]) {
-        const deductibleInfo = card.sections[2]?.content[0] || "No deductible information";
+        // "Service Fees" is sections[1] ("Why It Matters" is sections[0]) -
+        // every card has exactly 2 sections, so sections[2] was always undefined.
+        const deductibleInfo = card.sections[1]?.content[0] || "No deductible information";
         const displayName = card.id === MAJOR_PLAN_ID ? "Septic Major Component Plan" : card.title;
         serviceFeesText += `${displayName}: ${deductibleInfo}\n`;
+        // Plans with no deductible (e.g. Maintenance Plan) have no "$" amount
+        // in their text, so this naturally excludes them from the total.
+        const match = deductibleInfo.match(/\$([\d,]+(?:\.\d+)?)/);
+        if (match) {
+          totalDeductible += parseFloat(match[1].replace(/,/g, ""));
+        }
       }
     });
-    if (serviceFeesText === "") serviceFeesText += "No coverages selected\n";
+    if (serviceFeesText === "") {
+      serviceFeesText += "No coverages selected\n";
+    } else {
+      serviceFeesText += `\nTotal Deductibles: $${totalDeductible.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+    }
     return serviceFeesText;
   };
 
@@ -257,6 +273,21 @@ const PdfViewer = ({
           try {
             const field = form.getTextField(name);
             if (field) {
+              if (fontSize) {
+                // The template's /DA strings store the font name's leading
+                // slash as a literal "\057" octal escape. pdf-lib doesn't
+                // decode that back to "/", so its setFontSize() regex can't
+                // find the "Tf" operator and throws MissingTfOperatorError
+                // (silently swallowed below as "not found"), leaving the
+                // field's original auto-size behavior in place: pdf-lib fills
+                // the box height with the largest font that fits the text
+                // width, so short values in a tall box (e.g. one selected
+                // plan in "your_selected_coverages") render oversized while
+                // long ones (a 5-line list) coincidentally land near 10pt.
+                // Rewriting the DA with a clean ASCII string first fixes the
+                // parse so the explicit size below actually takes effect.
+                field.acroField.setDefaultAppearance(`/Helv ${fontSize} Tf 0 g`);
+              }
               field.setText(value || "");
               // Pin an explicit size so pdf-lib doesn't auto-shrink long text.
               if (fontSize) field.setFontSize(fontSize);
@@ -265,7 +296,7 @@ const PdfViewer = ({
               if (font) field.updateAppearances(font);
             }
           } catch (error) {
-            console.warn(`Field ${name} not found, skipping...`);
+            console.warn(`Field ${name} not found, skipping...`, error.message);
           }
         };
 
@@ -299,23 +330,32 @@ const PdfViewer = ({
           ? `The Coverage is for ${selectedCoveragesTenureList} from the Effective Date. At the end of each term, FLUSH may, at its discretion, issue a new Agreement with updated pricing and terms. Coverage will not continue beyond its term unless You accept and sign the new Agreement provided by FLUSH. Upon acceptance, any new rates and terms will apply during the renewal term and thereafter, alongside these terms and conditions.`
           : "No coverages selected.";
 
-        // Set all fields
+        // Set all fields. The four list-style fields below hold a variable
+        // number of lines (one plan selected vs. five), so they use the
+        // shrink-to-fit helper pinned at the template's 10pt Times body size
+        // instead of a flat size, matching the surrounding static text while
+        // still fitting if more plans are selected.
         setTextField("name", fullName);
         setTextField("address", address);
         setTextField("date", date);
-        setTextField("your_selected_coverages", coveragesText);
+        setFittedTextField("your_selected_coverages", coveragesText, timesFont, 10, 6);
         setTextField("total_monthly_cost", `$${totalMonthlyCost.toFixed(2)}/month`);
-        setTextField("covered_components", coveredComponentsText);
-        setTextField("service_fees_deductibles", serviceFeesDeductiblesText);
-        setTextField("not_included_covered", notIncludedComponentsText);
+        setFittedTextField("covered_components", coveredComponentsText, timesFont, 10, 6);
+        setFittedTextField("service_fees_deductibles", serviceFeesDeductiblesText, timesFont, 10, 6);
+        setFittedTextField("not_included_covered", notIncludedComponentsText, timesFont, 10, 6);
         setTextField("effective_date", currentDate);
         setTextField("full_name", billingName);
         setTextField("full_address", billingAddress);
         setTextField("client_full_name", fullName);
+        // Capped at 10 (not the helper's 11pt default) so this paragraph
+        // matches the surrounding 10pt Times body text exactly instead of
+        // being visibly larger.
         setFittedTextField(
           "price_adjustments_and_renewals",
           priceAdjustmentsAndRenewalsText,
-          timesFont
+          timesFont,
+          10,
+          6
         );
 
         // Add signature if available
